@@ -11,9 +11,12 @@ agent-skills/
 ├── LICENSE
 ├── README.md
 └── skills/
-    ├── mysql-insert/
+    ├── code-review/
     │   ├── SKILL.md       # When to use + step-by-step workflow
     │   └── reference.md   # Extra examples and details
+    ├── mysql-insert/
+    │   ├── SKILL.md
+    │   └── reference.md
     └── playwright-local-api-test/
         ├── SKILL.md
         └── reference.md
@@ -21,10 +24,11 @@ agent-skills/
 
 | Skill | What it helps the agent do |
 | --- | --- |
+| [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
 | [`mysql-insert`](skills/mysql-insert/) | Write safe, DBeaver-ready MySQL `INSERT` / seed SQL (discover → insert → verify → cleanup). |
 | [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against an endpoint using MySQL seed data, then write an HTML report. |
 
-These two skills are meant to work together: seed data with `mysql-insert`, then verify the API with `playwright-local-api-test`.
+`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` is independent — use it whenever you need a merge decision on a change.
 
 ## How a skill is structured
 
@@ -59,7 +63,9 @@ git clone git@github.com-personal:prapsky/agent-skills.git
 # or: git clone https://github.com/prapsky/agent-skills.git
 ```
 
-## Typical flow (high level)
+## Typical flows (high level)
+
+### Seed data + local API test
 
 ```mermaid
 sequenceDiagram
@@ -76,10 +82,28 @@ sequenceDiagram
   Agent-->>User: Results + report path
 ```
 
-1. **You** ask for seed SQL or a local API check.
+### Code review (merge decision)
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Agent
+  participant Review as code-review skill
+  participant GH as GitHub
+
+  User->>Agent: Review this PR against the plan
+  Agent->>Review: Read docs + diff (four passes)
+  Review-->>Agent: Yes/No + Must fix / Optional / After merge
+  opt post=true
+    Agent->>GH: APPROVE or REQUEST_CHANGES
+  end
+  Agent-->>User: Compact 4-section verdict
+```
+
+1. **You** ask for seed SQL, a local API check, or a PR review.
 2. **Agent** matches the request to a skill and reads `SKILL.md`.
-3. **Backend-style work** (behind the scenes): discover related rows, insert safely, call the API, write a report.
-4. **You** get copy-paste SQL and/or an HTML report—not a mystery one-off script.
+3. **Behind the scenes:** discover data / call APIs / compare the change to the agreement docs.
+4. **You** get SQL, an HTML report, or a clear merge verdict—not a vague essay.
 
 ## Adding a new skill
 

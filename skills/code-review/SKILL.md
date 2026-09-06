@@ -265,6 +265,6 @@ If the change depends on another PR or migration:
 | Situation | Do this instead |
 |-----------|-----------------|
 | No PR/branch and no agreed goal | Ask for scope first |
-| Author fixing review threads | Reply/fix workflow for that team |
+| Author fixing review threads | [`answer-code-reviews`](../answer-code-reviews/) |
 | Security deep-dive only | Threat-model / security skill if available |
 | Local cleanup with no merge decision | Refactor / simplify skill if available |

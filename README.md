@@ -11,6 +11,9 @@ agent-skills/
 ├── LICENSE
 ├── README.md
 └── skills/
+    ├── answer-code-reviews/
+    │   ├── SKILL.md
+    │   └── reference.md
     ├── code-review/
     │   ├── SKILL.md       # When to use + step-by-step workflow
     │   └── reference.md   # Extra examples and details
@@ -25,10 +28,11 @@ agent-skills/
 | Skill | What it helps the agent do |
 | --- | --- |
 | [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
+| [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |
 | [`mysql-insert`](skills/mysql-insert/) | Write safe, DBeaver-ready MySQL `INSERT` / seed SQL (discover → insert → verify → cleanup). |
 | [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against an endpoint using MySQL seed data, then write an HTML report. |
 
-`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` is independent — use it whenever you need a merge decision on a change.
+`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it.
 
 ## How a skill is structured
 
@@ -82,13 +86,14 @@ sequenceDiagram
   Agent-->>User: Results + report path
 ```
 
-### Code review (merge decision)
+### Code review + answer feedback
 
 ```mermaid
 sequenceDiagram
   participant User
   participant Agent
   participant Review as code-review skill
+  participant Answer as answer-code-reviews skill
   participant GH as GitHub
 
   User->>Agent: Review this PR against the plan
@@ -98,12 +103,16 @@ sequenceDiagram
     Agent->>GH: APPROVE or REQUEST_CHANGES
   end
   Agent-->>User: Compact 4-section verdict
+  User->>Agent: Address the review comments
+  Agent->>Answer: Fix, push, reply, resolve
+  Answer->>GH: Replies (+ optional resolve)
+  Agent-->>User: Finding / Action / Reply table
 ```
 
-1. **You** ask for seed SQL, a local API check, or a PR review.
+1. **You** ask for seed SQL, a local API check, a PR review, or help answering review comments.
 2. **Agent** matches the request to a skill and reads `SKILL.md`.
-3. **Behind the scenes:** discover data / call APIs / compare the change to the agreement docs.
-4. **You** get SQL, an HTML report, or a clear merge verdict—not a vague essay.
+3. **Behind the scenes:** discover data / call APIs / compare to agreement docs / fix and reply on threads.
+4. **You** get SQL, an HTML report, a merge verdict, or a short “what we fixed” table—not a vague essay.
 
 ## Adding a new skill
 

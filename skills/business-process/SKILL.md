@@ -17,7 +17,7 @@ description: >-
 
 ## When not to use
 
-- Writing **test cases / QA scripts** for the process → use a separate test skill when available
+- Writing **test cases / QA scripts** for the process → use [`test-cases`](../test-cases/)
 - OpenAPI dumps, design docs, or code walkthroughs as the main deliverable
 - Editing wiki/markdown notes only (unless the user also wants the HTML overview)
 
@@ -77,7 +77,7 @@ Scope checklist before writing HTML:
 - [ ] Named the **business process** (one outcome)
 - [ ] Listed **use cases** (actor + goal)
 - [ ] Drafted **acceptance criteria** per use case (GWT preferred)
-- [ ] **Do not** add a Test Cases section to this HTML (out of scope for this skill)
+- [ ] **Do not** add a Test Cases section here — hand off to [`test-cases`](../test-cases/)
 
 ---
 
@@ -156,7 +156,7 @@ Number sections **sequentially** (1, 2, 3…). Skip only when truly N/A; no numb
 | Next | **Infrastructure Inventory** | Cache, messaging, flags, DBs, jobs, full URLs — see [reference.md](reference.md). |
 | Last | **Key Takeaways** | 5–8 bullets. Include critical topic / table / flag names. |
 
-**Do not include** a Test Cases section in this deliverable.
+**Do not include** a Test Cases section in this deliverable — use [`test-cases`](../test-cases/) instead.
 
 ### Header (always)
 
@@ -261,7 +261,7 @@ Keep diagrams high-level. Put real topic/table names on arrows when helpful. Avo
 
 - [ ] Page opens standalone in a browser (no build step)
 - [ ] Non-technical reader can explain the process in under five minutes
-- [ ] Sections numbered without gaps; **no Test Cases section**
+- [ ] Sections numbered without gaps; **no Test Cases section** (use [`test-cases`](../test-cases/))
 - [ ] Every major frontend action has a matching backend explanation
 - [ ] Mermaid diagrams render
 - [ ] Endpoints use correct method badges and real paths

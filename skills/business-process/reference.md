@@ -198,7 +198,7 @@ Flowchart: subgraphs for Channels · Core systems · Business outcome (e.g. chan
 </html>
 ```
 
-**Do not** add a Test Cases block — that belongs in a separate skill/deliverable.
+**Do not** add a Test Cases block — use the [`test-cases`](../test-cases/) skill.
 
 ---
 

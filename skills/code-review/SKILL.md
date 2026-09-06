@@ -19,7 +19,7 @@ description: >-
 
 **Not for:**
 - Writing or rewriting the feature (implement first, then review)
-- Replying as the author fixing review comments (use your team’s reply/fix skill if you have one)
+- Replying as the author fixing review comments → [`answer-code-reviews`](../answer-code-reviews/)
 - Vague “look at this file” with no PR/branch and no goal — ask for a PR, branch, or stated goal first
 
 ---

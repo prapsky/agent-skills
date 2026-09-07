@@ -20,7 +20,7 @@ description: >-
 
 - Authoring the full **business process overview** HTML → use [`business-process`](../business-process/)
 - Running automated Playwright API tests → use [`playwright-local-api-test`](../playwright-local-api-test/)
-- Writing unit/integration code tests unless the user explicitly asks for that format
+- Writing automated unit/integration **code** tests → use [`unit-test`](../unit-test/)
 
 ## Goals
 
@@ -213,6 +213,7 @@ Always show:
 |-------|----------------|
 | [`business-process`](../business-process/) | Journey map + ACs → feed this skill |
 | [`playwright-local-api-test`](../playwright-local-api-test/) | Automate selected API cases after cases exist |
+| [`unit-test`](../unit-test/) | Automated in-process unit tests (table-driven code), not QA checklists |
 | [`mysql-insert`](../mysql-insert/) | Seed data for cases that need DB fixtures |
 
 ---

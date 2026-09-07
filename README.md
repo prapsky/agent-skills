@@ -26,21 +26,25 @@ agent-skills/
     ├── playwright-local-api-test/
     │   ├── SKILL.md
     │   └── reference.md
-    └── test-cases/
-        ├── SKILL.md       # Positive/negative QA cases per channel
-        └── reference.md   # HTML table snippets + tips
+    ├── test-cases/
+    │   ├── SKILL.md       # Positive/negative QA cases per channel
+    │   └── reference.md   # HTML table snippets + tips
+    └── unit-test/
+        ├── SKILL.md       # Table-driven automated unit tests
+        └── reference.md   # Before/after Go examples
 ```
 
 | Skill | What it helps the agent do |
 | --- | --- |
 | [`business-process`](skills/business-process/) | Author a standalone non-technical business-process overview HTML (FE↔BE, systems, infra inventory). |
 | [`test-cases`](skills/test-cases/) | Author positive/negative QA test cases (HTML or Markdown) from use cases and acceptance criteria. |
+| [`unit-test`](skills/unit-test/) | Write or rewrite automated unit tests as table-driven cases (match package style, run focused tests). |
 | [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
 | [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |
 | [`mysql-insert`](skills/mysql-insert/) | Write safe, DBeaver-ready MySQL `INSERT` / seed SQL (discover → insert → verify → cleanup). |
 | [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against an endpoint using MySQL seed data, then write an HTML report. |
 
-`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it. `business-process` and `test-cases` are a pair: journey overview first, then QA cases.
+`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it. `business-process` and `test-cases` are a pair: journey overview first, then QA cases. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
 
 ## How a skill is structured
 
@@ -118,10 +122,10 @@ sequenceDiagram
   Agent-->>User: Finding / Action / Reply table
 ```
 
-1. **You** ask for seed SQL, a local API check, a business-process HTML overview, QA test cases, a PR review, or help answering review comments.
+1. **You** ask for seed SQL, a local API check, a business-process HTML overview, QA test cases, unit tests, a PR review, or help answering review comments.
 2. **Agent** matches the request to a skill and reads `SKILL.md`.
-3. **Behind the scenes:** discover data / call APIs / compare to agreement docs / research a journey / draft cases / fix and reply on threads.
-4. **You** get SQL, an HTML report, a process overview page, a test-case table, a merge verdict, or a short “what we fixed” table—not a vague essay.
+3. **Behind the scenes:** discover data / call APIs / compare to agreement docs / research a journey / draft cases / write table-driven unit tests / fix and reply on threads.
+4. **You** get SQL, an HTML report, a process overview page, a test-case table, passing unit tests, a merge verdict, or a short “what we fixed” table—not a vague essay.
 
 ## Adding a new skill
 

@@ -19,7 +19,6 @@ agent-skills/
     ├── local-docker-firestore/
     ├── local-docker-mysql/
     ├── local-docker-redis/
-    ├── mysql-insert/
     ├── playwright-local-api-test/
     ├── test-cases/
     └── unit-test/
@@ -33,14 +32,13 @@ agent-skills/
 | [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
 | [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |
 | [`create-pull-request`](skills/create-pull-request/) | Open a GitHub PR with a clear title, Summary, and Test plan (apply relevant skills to the diff first). |
-| [`mysql-insert`](skills/mysql-insert/) | Seed local **Docker MySQL** (and ensure **Docker Redis** for API tests); DBeaver-ready INSERT (discover → insert → verify). Never staging. |
-| [`local-docker-mysql`](skills/local-docker-mysql/) | Start / health-check / inspect / ticket-scoped verify for local Docker MySQL (`app-mysql-local`). |
+| [`local-docker-mysql`](skills/local-docker-mysql/) | Start / seed (INSERT…SELECT) / verify / inspect local Docker MySQL (`app-mysql-local`). Replaces former `mysql-insert`. |
 | [`local-docker-redis`](skills/local-docker-redis/) | Start / health-check / seed keys / scan for local Docker Redis (`app-redis-local`). |
 | [`local-docker-dynamodb`](skills/local-docker-dynamodb/) | Start / tables / PutItem / scan for local DynamoDB (`app-dynamodb-local` → `:8000`). |
 | [`local-docker-firestore`](skills/local-docker-firestore/) | Start / seed / read for Firestore emulator (`app-firestore-local` → `:8080`). |
-| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against **Docker MySQL + Docker Redis**, using mysql-insert seeds, write an HTML report, and **always** deliver the standard result report (chat + auto PR comment when a PR is in context). |
+| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against **Docker MySQL + Docker Redis**, using `local-docker-mysql` seeds, write an HTML report, and **always** deliver the standard result report (chat + auto PR comment when a PR is in context). |
 
-`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `mysql-insert` and `playwright-local-api-test` work together for relational API tests; add Dynamo/Firestore skills when those stores are in the path. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
+`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `local-docker-mysql` and `playwright-local-api-test` work together for relational API tests; add Redis/Dynamo/Firestore skills when those stores are in the path. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
 
 ## How a skill is structured
 
@@ -64,7 +62,6 @@ cp -R skills/local-docker-mysql /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-redis /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-dynamodb /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-firestore /path/to/your-project/.cursor/skills/
-cp -R skills/mysql-insert /path/to/your-project/.cursor/skills/
 cp -R skills/playwright-local-api-test /path/to/your-project/.cursor/skills/
 ```
 
@@ -87,7 +84,7 @@ git clone git@github.com-personal:prapsky/agent-skills.git
 sequenceDiagram
   participant User
   participant Agent
-  participant MySQL as local-docker-mysql / mysql-insert
+  participant MySQL as local-docker-mysql
   participant Redis as local-docker-redis
   participant PW as playwright-local-api-test skill
 

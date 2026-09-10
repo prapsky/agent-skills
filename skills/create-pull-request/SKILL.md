@@ -18,7 +18,6 @@ Before creating any Pull Request:
    - `create-pull-request` (this file) — process + title/body
    - `unit-test` — when the PR adds/changes unit tests (table-driven)
    - `code-review` — optional self-check before/after open
-   - `mysql-insert` — only if the PR adds/changes SQL seed scripts
    - `local-docker-mysql` / `local-docker-redis` / `local-docker-dynamodb` / `local-docker-firestore` — only if the PR adds/changes those local-store skills or Docker seed recipes
    - `playwright-local-api-test` — only if the PR adds/changes Playwright API tests
    - Any other project skill that clearly applies to the diff

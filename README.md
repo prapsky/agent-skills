@@ -20,6 +20,9 @@ agent-skills/
     ├── code-review/
     │   ├── SKILL.md       # When to use + step-by-step workflow
     │   └── reference.md   # Extra examples and details
+    ├── create-pull-request/
+    │   ├── SKILL.md       # PR process + title/body
+    │   └── reference.md   # Examples and optional frontmatter
     ├── mysql-insert/
     │   ├── SKILL.md
     │   └── reference.md
@@ -41,10 +44,12 @@ agent-skills/
 | [`unit-test`](skills/unit-test/) | Write or rewrite automated unit tests as table-driven cases (match package style, run focused tests). |
 | [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
 | [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |
-| [`mysql-insert`](skills/mysql-insert/) | Write safe, DBeaver-ready MySQL `INSERT` / seed SQL (discover → insert → verify → cleanup). |
-| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against an endpoint using MySQL seed data, then write an HTML report. |
+| [`create-pull-request`](skills/create-pull-request/) | Open a GitHub PR with a clear title, Summary, and Test plan (apply relevant skills to the diff first). |
+| [`mysql-insert`](skills/mysql-insert/) | Seed local **Docker MySQL** (and ensure **Docker Redis** for API tests); DBeaver-ready INSERT (discover → insert → verify). Never staging. |
+| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against **Docker MySQL + Docker Redis**, using mysql-insert seeds, then write an HTML report. |
 
-`mysql-insert` and `playwright-local-api-test` work together: seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it. `business-process` and `test-cases` are a pair: journey overview first, then QA cases. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
+`mysql-insert` and `playwright-local-api-test` work together: start local Docker MySQL + Redis, seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it. `create-pull-request` opens the PR; use `code-review` afterward when a review is requested. `business-process` and `test-cases` are a pair: journey overview first, then QA cases. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
+
 
 ## How a skill is structured
 
@@ -92,9 +97,9 @@ sequenceDiagram
   participant PW as playwright-local-api-test skill
 
   User->>Agent: Need seed data + test this API
-  Agent->>MySQL: Follow insert / verify / cleanup
+  Agent->>MySQL: Start Docker MySQL + Redis, then seed
   MySQL-->>Agent: Seed rows (ids, fields)
-  Agent->>PW: Call endpoint with seed data
+  Agent->>PW: Call local API (Docker MySQL + Redis)
   PW-->>Agent: HTML test report
   Agent-->>User: Results + report path
 ```

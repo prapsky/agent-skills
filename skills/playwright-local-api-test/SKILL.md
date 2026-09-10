@@ -1,159 +1,94 @@
 ---
 name: playwright-local-api-test
 description: >-
-  Run local Playwright API tests against a given endpoint using MySQL seed data
-  (from the mysql-insert skill), then write an HTML result report. Use when the
-  user asks to test locally with Playwright, verify an API with seeded MySQL
-  data, or report Playwright results in HTML.
+  Run local Playwright API tests against Docker MySQL + Docker Redis, with seed
+  data from mysql-insert, write HTML reports, and optionally post a short PR
+  test comment. Use when testing locally with Playwright, verifying an API with
+  seeded MySQL data, or reporting results. Never use remote staging MySQL or
+  Redis.
 ---
 
 # Playwright — local API test
 
-## When to use
+## Token rules (do these first)
 
-- User wants to **test locally with Playwright**
-- Inputs available (or can be gathered): **MySQL seed data** + **endpoint**
-- User wants results in an **HTML file**
+1. **Reuse** the repo’s existing `playwright/local-api/` (or equivalent) folder — do not scaffold a new project.
+2. **Reuse** `/tmp/<case>-seed.json` + `/tmp/<case>-body.json` from `mysql-insert`.
+3. **Do not** curl a mutating endpoint and then run Playwright on the **same** consumed seed without reseed (second call may hang/time out).
+4. **Local Docker MySQL + Redis only** — `app-mysql-local` + `app-redis-local`. Never cloud DB proxies or remote staging DB/Redis. See `mysql-insert` + [reference.md](reference.md).
+5. Keep chat short: pass/fail + URLs + report paths. Details → [reference.md](reference.md).
 
-## When not to use
+## When to use / skip
 
-- Generating MySQL seed SQL only → use `mysql-insert`
-- Browser UI E2E unless the user explicitly asks for UI flows
-- During PR creation: **skip** unless the PR adds/changes Playwright tests
+| Use | Skip |
+|-----|------|
+| Local API test + HTML report | SQL-only → `mysql-insert` |
+| PR comment with local proof (if user asks) | UI E2E unless asked |
+| | PR create unless PR adds Playwright tests |
 
-## Inputs
+## Defaults (adjust per project)
 
-| Input | Source | Required |
-|-------|--------|----------|
-| **Seed data** | Output / verify rows from `mysql-insert` (ids, phone, names, FKs, etc.) | Yes |
-| **Endpoint** | `METHOD` + full URL (or base URL + path) | Yes |
-| Request body / headers | User or mapped from seed fields | If the endpoint needs them |
-| Expected status / body checks | User (default: 2xx, no 5xx) | Optional |
+| Item | Typical value |
+|------|----------------|
+| Dir | `playwright/local-api/` (or the repo’s existing path) |
+| URL | `http://127.0.0.1:<port>/<api-path>` |
+| MySQL | Docker `app-mysql-local` → `127.0.0.1:3306` / match local env |
+| Redis | Docker `app-redis-local` → `127.0.0.1:6379`, empty password |
+| Env | Load local env file via Python — never `source` in zsh |
+| Start API | Project’s usual local start (build + run / function target / compose) |
+| Timeout | Raise per endpoint if cache / external deps are slow |
+| Specs | Table-driven; attach seed/request/response; write `/tmp/<case>-pw-result.json` |
 
-If seed data is missing, run or ask for `mysql-insert` first, then continue.
-
-### Seed data shape (from `mysql-insert`)
-
-Accept whatever the insert verified, as a simple object. Example:
-
-```json
-{
-  "table": "leads",
-  "id": "d7b406af-a2d2-4237-88c3-1c1693e9153f",
-  "phone": "6281268293775",
-  "club": "FIT HUB BLOK M",
-  "extra": {}
-}
-```
-
-Map seed fields into the request body using names the user gives (e.g. `phone` → body field, `id` → path param). Do not invent fields.
-
-## Outputs
-
-Always write HTML under a local report folder (create if needed):
-
-1. `playwright-report/index.html` — Playwright HTML reporter  
-2. `playwright-report/result.html` — short human summary (required)
-
-Return both paths to the user.
-
-## Workflow
-
-```
-- [ ] 1. Confirm seed data + endpoint (+ expected status if given)
-- [ ] 2. Confirm local service is reachable (quick curl/probe)
-- [ ] 3. Create/update a small Playwright API test from inputs
-- [ ] 4. Run Playwright with list + html reporters
-- [ ] 5. Write result.html summary
-- [ ] 6. Tell user pass/fail + report paths
-```
-
-### 1. Confirm inputs
-
-Ask only if missing:
-
-- Seed object (or “use the rows from mysql-insert just created”)
-- `METHOD` + URL
-- Body/headers mapping from seed
-- Expected HTTP status (default `200`–`299`)
-
-### 2. Local service
-
-- Prefer user-provided base URL (e.g. `http://127.0.0.1:5007`)
-- Prefer `.env.testing` when the user shared it for local runs
-- Load env with a parser (Python/`dotenv`) — do **not** `source` `.env` in zsh when values contain `?` / special chars
-
-### 3. Playwright test (API request)
-
-Keep tests API-level with `request` fixture unless UI is requested.
-
-Minimal pattern:
-
-```ts
-import { test, expect } from '@playwright/test';
-
-const BASE = process.env.PW_BASE_URL!;
-const METHOD = process.env.PW_METHOD || 'POST';
-const PATH = process.env.PW_PATH!;
-const BODY = JSON.parse(process.env.PW_BODY_JSON || '{}');
-const EXPECT_STATUS = Number(process.env.PW_EXPECT_STATUS || '0'); // 0 = any 2xx
-
-test('local API', async ({ request }) => {
-  const res = await request.fetch(`${BASE}${PATH}`, {
-    method: METHOD,
-    data: ['GET', 'HEAD'].includes(METHOD) ? undefined : BODY,
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const status = res.status();
-  const text = await res.text();
-  await test.info().attach('seed', { body: process.env.PW_SEED_JSON || '{}', contentType: 'application/json' });
-  await test.info().attach('response', { body: text, contentType: 'application/json' });
-  if (EXPECT_STATUS > 0) expect(status, text).toBe(EXPECT_STATUS);
-  else expect(status, text).toBeGreaterThanOrEqual(200), expect(status, text).toBeLessThan(300);
-});
-```
-
-Project layout (default if none exists):
-
-```text
-playwright/local-api/
-  package.json          # @playwright/test
-  playwright.config.ts  # reporter: list + html → playwright-report
-  tests/api.spec.ts
-  playwright-report/
-```
-
-Place under the relevant service repo or workspace `playwright/` — reuse an existing Playwright folder when present.
-
-### 4. Run
+### Preflight (before starting the API)
 
 ```bash
-cd <playwright-project>
-PW_BASE_URL='http://127.0.0.1:<port>' \
-PW_METHOD='POST' \
-PW_PATH='/v1/...' \
-PW_BODY_JSON='{"...":"..."}' \
-PW_SEED_JSON='{"id":"..."}' \
-PW_EXPECT_STATUS='201' \
-npx playwright test --reporter=list,html
+# MySQL
+docker start app-mysql-local 2>/dev/null || true
+docker exec app-mysql-local mysqladmin ping -h 127.0.0.1 -uroot -papp_root_local --silent
+
+# Redis
+docker start app-redis-local 2>/dev/null || \
+  docker run -d --name app-redis-local -p 6379:6379 redis:7-alpine
+docker exec app-redis-local redis-cli ping   # PONG
 ```
 
-### 5. `result.html` summary
+Full `docker run` for MySQL: `mysql-insert` [reference.md](../mysql-insert/reference.md).
 
-Include:
+### Local connection rules (do not point at staging)
 
-- PASSED / FAILED
-- Endpoint (`METHOD URL`)
-- Seed data used (no secrets)
-- Request body (redact tokens/passwords)
-- Response status + body excerpt
-- Timestamp
-- Link to `./index.html`
+| Concern | Rule |
+|---------|------|
+| MySQL | Plain TCP to `127.0.0.1:3306` (disable cloud connectors for the local run) |
+| Redis | `REDIS_HOST=127.0.0.1`, `REDIS_PORT=6379`, empty password unless you set one |
+| Secrets | Do not print passwords; do not post them in HTML/PR comments |
 
-Template: [reference.md](reference.md).
+## Checklist
+
+```
+- [ ] 1. Docker daemon up
+- [ ] 2. app-mysql-local healthy on 3306
+- [ ] 3. app-redis-local healthy on 6379 (PONG)
+- [ ] 4. Seed JSON ready (mysql-insert) + body mapping
+- [ ] 5. API listening on local Docker MySQL + Redis (one probe OR Playwright — not both on same consumed seed)
+- [ ] 6. Run: npx playwright test tests/<spec>.ts --reporter=list,html
+- [ ] 7. Write playwright-report/result.html
+- [ ] 8. If user asked: post PR comment (format below)
+```
+
+## PR comment format (only when asked)
+
+Use **multi-line** JSON (not one line):
+
+1. **The issue** + issue log  
+2. **Endpoint URL local**  
+3. **Request body**  
+4. **Response**  
+5. **Explanation** — one simple sentence  
 
 ## Security
 
-- Never put DB passwords, API keys, or `.env` secrets in HTML reports
-- Do not commit `.env` / `.env.testing`
-- Prefer staging/local endpoints only unless the user explicitly asks otherwise
+- No secrets in HTML, attachments, or PR comments  
+- **Local Docker MySQL + Redis only** unless user explicitly asks otherwise  
+- Never remote staging MySQL, staging Redis, cloud DB proxies for this flow, or production  
+
+Templates & mapping: [reference.md](reference.md).

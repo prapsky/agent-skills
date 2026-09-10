@@ -2,8 +2,9 @@
 name: playwright-local-api-test
 description: >-
   Run local Playwright API tests against Docker MySQL + Docker Redis, with seed
-  data from mysql-insert, write HTML reports, and optionally post a short PR
-  test comment. Use when testing locally with Playwright, verifying an API with
+  data from mysql-insert, write HTML reports, and always deliver the standard
+  local-test result report (chat + result.html; auto PR comment when a PR is in
+  context). Use when testing locally with Playwright, verifying an API with
   seeded MySQL data, or reporting results. Never use remote staging MySQL or
   Redis.
 ---
@@ -16,14 +17,14 @@ description: >-
 2. **Reuse** `/tmp/<case>-seed.json` + `/tmp/<case>-body.json` from `mysql-insert`.
 3. **Do not** curl a mutating endpoint and then run Playwright on the **same** consumed seed without reseed (second call may hang/time out).
 4. **Local Docker MySQL + Redis only** — `app-mysql-local` + `app-redis-local`. Never cloud DB proxies or remote staging DB/Redis. See `mysql-insert` + [reference.md](reference.md).
-5. Keep chat short: pass/fail + URLs + report paths. Details → [reference.md](reference.md).
+5. Keep the chat lead-in short (pass/fail + URLs), then **always** append the [Result report format](#result-report-format-mandatory). Details → [reference.md](reference.md).
 
 ## When to use / skip
 
 | Use | Skip |
 |-----|------|
-| Local API test + HTML report | SQL-only → `mysql-insert` |
-| PR comment with local proof (if user asks) | UI E2E unless asked |
+| Local API test + HTML report + **mandatory result report** | SQL-only → `mysql-insert` |
+| Auto PR comment with local proof when a PR is in context | UI E2E unless asked |
 | | PR create unless PR adds Playwright tests |
 
 ## Defaults (adjust per project)
@@ -71,23 +72,65 @@ Full `docker run` for MySQL: `mysql-insert` [reference.md](../mysql-insert/refer
 - [ ] 4. Seed JSON ready (mysql-insert) + body mapping
 - [ ] 5. API listening on local Docker MySQL + Redis (one probe OR Playwright — not both on same consumed seed)
 - [ ] 6. Run: npx playwright test tests/<spec>.ts --reporter=list,html
-- [ ] 7. Write playwright-report/result.html
-- [ ] 8. If user asked: post PR comment (format below)
+- [ ] 7. Write playwright-report/result.html using the Result report format
+- [ ] 8. Always deliver the Result report in chat (same sections)
+- [ ] 9. If a PR is in context: post the same Result report as a PR comment (unless user said not to)
 ```
 
-## PR comment format (only when asked)
+## Result report format (mandatory)
 
-Use **multi-line** JSON (not one line):
+**Whenever local testing finishes** (Playwright and/or local API probe after `mysql-insert` seed), always produce this report:
 
-1. **The issue** + issue log  
-2. **Endpoint URL local**  
-3. **Request body**  
-4. **Response**  
-5. **Explanation** — one simple sentence  
+1. In chat (after the short pass/fail line)
+2. In `playwright-report/result.html`
+3. As a PR comment when a PR URL/number/branch PR is in context (auto; skip only if the user says not to comment)
+
+Use these **exact section headings**. Request body and response must be **multi-line JSON**, never one line. No secrets.
+
+```markdown
+### The issue
+<what was wrong for the user / product>
+**Issue log:**
+\`\`\`json
+{ ... evidence of the problem / seed before fix ... }
+\`\`\`
+
+### What is the root cause
+<why it happened>
+
+### What you actually did in this PR
+<what this change does to fix it>
+
+### The local endpoint URL
+`<full local URL>`
+
+### The request body
+\`\`\`json
+{
+  ...
+}
+\`\`\`
+
+### The response
+\`\`\`json
+{
+  ...
+}
+\`\`\`
+
+### The explanation of the result
+<one simple sentence>
+```
+
+Notes:
+
+- GET endpoints: still show a multi-line JSON object (`method`, `path`, `headers` with secrets redacted, `body: null`) — do not omit the section.
+- Failed runs: same sections; explanation states what failed in one sentence; mark PASSED/FAILED in `result.html`.
+- Template example: [reference.md](reference.md#result-report-template).
 
 ## Security
 
-- No secrets in HTML, attachments, or PR comments  
+- No secrets in HTML, attachments, chat reports, or PR comments  
 - **Local Docker MySQL + Redis only** unless user explicitly asks otherwise  
 - Never remote staging MySQL, staging Redis, cloud DB proxies for this flow, or production  
 

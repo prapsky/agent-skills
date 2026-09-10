@@ -89,43 +89,68 @@ print("status", status)  # never print token
 
 ## Result report format (mandatory)
 
-Exact section headings. Multi-line JSON only. No secrets.
+**Whenever local API testing finishes** (Python probe after seed), always produce this report:
+
+1. In chat (after the short pass/fail line)
+2. In `result.html` (under `/tmp/<case>-result.html` or the project’s report path)
+3. As a PR comment and/or issue tracker comment when a PR/issue is in context (auto; skip only if the user says not to comment)
+
+Use these **exact section headings**. Request body and response must be **multi-line JSON**, never one line. No secrets.
 
 ```markdown
 ### The issue
-<what was wrong>
+<what was wrong for the user / product>
 **Issue log:**
 \`\`\`json
-{ ... }
+{
+  "id": "…",
+  "problem": "…"
+}
 \`\`\`
 
 ### What is the root cause
-<why>
+<why it happened>
 
 ### What you actually did in this PR
-<fix, or "local replication only">
+<what this change does to fix it — or "local replication only" when no code fix>
 
 ### The local endpoint URL
-`<full local URL>`
+\`http://127.0.0.1:<port>/<path>\`
 
 ### The request body
 \`\`\`json
 {
   "method": "GET",
   "path": "/v1/example",
-  "headers": { "Authorization": "Bearer <redacted>" },
+  "headers": {
+    "Authorization": "Bearer <redacted>",
+    "Content-Type": "application/json"
+  },
   "body": null
 }
 \`\`\`
 
 ### The response
 \`\`\`json
-{ ... }
+{
+  "data": {
+    "example_field": "…"
+  },
+  "meta": {
+    "status_code": 200
+  }
+}
 \`\`\`
 
 ### The explanation of the result
-<one simple sentence>
+<one simple sentence about pass or fail>
 ```
+
+Notes:
+
+- GET endpoints: still show a multi-line JSON object (`method`, `path`, `headers` with secrets redacted, `body: null`) — do not omit the section.
+- Failed runs: same sections; explanation states what failed in one sentence; mark PASSED/FAILED in `result.html`.
+- Template example: [reference.md](reference.md#result-report-template).
 
 ## Related skills
 

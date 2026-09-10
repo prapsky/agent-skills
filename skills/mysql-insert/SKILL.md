@@ -4,8 +4,9 @@ description: >-
   Generate or run safe local Docker MySQL seed SQL (DBeaver-ready), and ensure
   local Docker Redis is available for Playwright API tests. Use when seeding
   fixtures, mysql-insert, DBeaver SQL, or preparing data for Playwright local
-  API tests. Prefer short verify JSON for downstream tools. Never use remote
-  staging databases or staging Redis.
+  API tests. Prefer short verify JSON for downstream tools. When local API
+  testing follows, hand off to playwright-local-api-test for the mandatory
+  result report. Never use remote staging databases or staging Redis.
 ---
 
 # MySQL insert
@@ -89,5 +90,7 @@ General rules:
 1. One line: what was seeded  
 2. Seed JSON path + key fields  
 3. Cleanup SQL (only if useful)
+
+When the work continues into a **local API / Playwright** run, follow `playwright-local-api-test` and **always** deliver that skill’s [Result report format](../playwright-local-api-test/SKILL.md#result-report-format-mandatory) (chat + `result.html`; auto PR comment when a PR is in context). Do not stop at seed-only output if the user asked to test locally.
 
 Details: [reference.md](reference.md).

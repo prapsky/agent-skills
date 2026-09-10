@@ -44,9 +44,60 @@ docker exec app-redis-local redis-cli ping
 
 Seed / more detail: `mysql-insert` skill + its `reference.md`.
 
-## `result.html` (minimal)
+## Result report template
 
-Include: PASSED/FAILED, endpoint, seed (no secrets), request, status, response, one-line explanation, link to `./index.html`, ISO time.
+Always use these headings after a local test run (chat + `result.html` + PR comment when a PR is in context):
+
+```markdown
+### The issue
+...
+**Issue log:**
+```json
+{
+  "record_id": "…",
+  "problem": "…"
+}
+```
+
+### What is the root cause
+...
+
+### What you actually did in this PR
+...
+
+### The local endpoint URL
+`http://127.0.0.1:<port>/<api-path>`
+
+### The request body
+```json
+{
+  "method": "GET",
+  "path": "/<api-path>",
+  "headers": {
+    "Authorization": "Bearer <redacted>",
+    "Content-Type": "application/json"
+  },
+  "body": null
+}
+```
+
+### The response
+```json
+{
+  "data": {
+    "example_field": "readable value"
+  },
+  "meta": {
+    "status_code": 200
+  }
+}
+```
+
+### The explanation of the result
+One simple sentence about pass or fail.
+```
+
+`result.html` should also include: PASSED/FAILED banner, Docker MySQL/Redis note, ISO time, and a link to `./index.html`.
 
 ## Seed → body
 
@@ -70,7 +121,7 @@ npx playwright test tests/<spec>.ts --reporter=list,html
 3. Seed + `/tmp/<case>-seed.json`  
 4. Map body → `/tmp/<case>-body.json`  
 5. Start API once against local Docker; run Playwright **or** curl — not both without reseed when the first call consumes the fixture  
-6. `result.html` + optional PR comment  
+6. Always deliver the Result report (chat + `result.html`; auto PR comment when PR in context)  
 
 ## Cleanup
 

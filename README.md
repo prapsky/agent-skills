@@ -46,7 +46,7 @@ agent-skills/
 | [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |
 | [`create-pull-request`](skills/create-pull-request/) | Open a GitHub PR with a clear title, Summary, and Test plan (apply relevant skills to the diff first). |
 | [`mysql-insert`](skills/mysql-insert/) | Seed local **Docker MySQL** (and ensure **Docker Redis** for API tests); DBeaver-ready INSERT (discover → insert → verify). Never staging. |
-| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against **Docker MySQL + Docker Redis**, using mysql-insert seeds, then write an HTML report. |
+| [`playwright-local-api-test`](skills/playwright-local-api-test/) | Run local Playwright **API** tests against **Docker MySQL + Docker Redis**, using mysql-insert seeds, write an HTML report, and **always** deliver the standard result report (chat + auto PR comment when a PR is in context). |
 
 `mysql-insert` and `playwright-local-api-test` work together: start local Docker MySQL + Redis, seed data, then verify the API. `code-review` and `answer-code-reviews` are a pair: one posts the review, the other responds to it. `create-pull-request` opens the PR; use `code-review` afterward when a review is requested. `business-process` and `test-cases` are a pair: journey overview first, then QA cases. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
 
@@ -100,8 +100,8 @@ sequenceDiagram
   Agent->>MySQL: Start Docker MySQL + Redis, then seed
   MySQL-->>Agent: Seed rows (ids, fields)
   Agent->>PW: Call local API (Docker MySQL + Redis)
-  PW-->>Agent: HTML test report
-  Agent-->>User: Results + report path
+  PW-->>Agent: HTML report + standard result report
+  Agent-->>User: Results + report path (+ PR comment if PR in context)
 ```
 
 ### Code review + answer feedback
@@ -130,7 +130,7 @@ sequenceDiagram
 1. **You** ask for seed SQL, a local API check, a business-process HTML overview, QA test cases, unit tests, a PR review, or help answering review comments.
 2. **Agent** matches the request to a skill and reads `SKILL.md`.
 3. **Behind the scenes:** discover data / call APIs / compare to agreement docs / research a journey / draft cases / write table-driven unit tests / fix and reply on threads.
-4. **You** get SQL, an HTML report, a process overview page, a test-case table, passing unit tests, a merge verdict, or a short “what we fixed” table—not a vague essay.
+4. **You** get SQL, an HTML report plus the standard local-test result report, a process overview page, a test-case table, passing unit tests, a merge verdict, or a short “what we fixed” table—not a vague essay.
 
 ## Adding a new skill
 

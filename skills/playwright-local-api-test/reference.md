@@ -6,7 +6,7 @@
 |----|--------|
 | Docker MySQL `app-mysql-local` on `127.0.0.1:3306` | Cloud DB proxy to remote staging |
 | Docker Redis `app-redis-local` on `127.0.0.1:6379` | Remote staging Redis hosts / passwords |
-| Seed via `mysql-insert` against Docker MySQL | Seeding or testing against remote staging DBs |
+| Seed via `local-docker-mysql` against Docker MySQL | Seeding or testing against remote staging DBs |
 | Load local env aligned to Docker | Tunnel ports used only to reach remote DBs |
 
 ### Start MySQL
@@ -42,7 +42,7 @@ docker exec app-redis-local redis-cli ping
 | MySQL | TCP → `127.0.0.1:3306` / match Docker `MYSQL_*` |
 | Redis | `127.0.0.1:6379`, empty password by default |
 
-Seed / more detail: `mysql-insert` skill + its `reference.md`.
+Seed / more detail: `local-docker-mysql` skill + its `reference.md`.
 
 ## Result report template
 
@@ -114,7 +114,7 @@ PW_BODY_JSON="$(cat /tmp/<case>-body.json)" \
 npx playwright test tests/<spec>.ts --reporter=list,html
 ```
 
-## Pairing with `mysql-insert`
+## Pairing with `local-docker-mysql`
 
 1. Docker daemon up  
 2. `app-mysql-local` + `app-redis-local` healthy  

@@ -2,11 +2,11 @@
 name: playwright-local-api-test
 description: >-
   Run local Playwright API tests against Docker MySQL + Docker Redis, with seed
-  data from mysql-insert, write HTML reports, and always deliver the standard
-  local-test result report (chat + result.html; auto PR comment when a PR is in
-  context). Use when testing locally with Playwright, verifying an API with
-  seeded MySQL data, or reporting results. Never use remote staging MySQL or
-  Redis.
+  data from local-docker-mysql, write HTML reports, and always deliver the
+  standard local-test result report (chat + result.html; auto PR comment when a
+  PR is in context). Use when testing locally with Playwright, verifying an API
+  with seeded MySQL data, or reporting results. Never use remote staging MySQL
+  or Redis.
 ---
 
 # Playwright — local API test
@@ -14,16 +14,16 @@ description: >-
 ## Token rules (do these first)
 
 1. **Reuse** the repo’s existing `playwright/local-api/` (or equivalent) folder — do not scaffold a new project.
-2. **Reuse** `/tmp/<case>-seed.json` + `/tmp/<case>-body.json` from `mysql-insert`.
+2. **Reuse** `/tmp/<case>-seed.json` + `/tmp/<case>-body.json` from `local-docker-mysql`.
 3. **Do not** curl a mutating endpoint and then run Playwright on the **same** consumed seed without reseed (second call may hang/time out).
-4. **Local Docker MySQL + Redis only** — `app-mysql-local` + `app-redis-local`. Never cloud DB proxies or remote staging DB/Redis. See `mysql-insert` + [reference.md](reference.md).
+4. **Local Docker MySQL + Redis** — `app-mysql-local` + `app-redis-local`; also start Dynamo/Firestore via `local-docker-dynamodb` / `local-docker-firestore` when the case needs them. Never cloud DB proxies or remote staging stores. See `local-docker-mysql`, `local-docker-redis`, + [reference.md](reference.md).
 5. Keep the chat lead-in short (pass/fail + URLs), then **always** append the [Result report format](#result-report-format-mandatory). Details → [reference.md](reference.md).
 
 ## When to use / skip
 
 | Use | Skip |
 |-----|------|
-| Local API test + HTML report + **mandatory result report** | SQL-only → `mysql-insert` |
+| Local API test + HTML report + **mandatory result report** | SQL-only → `local-docker-mysql` |
 | Auto PR comment with local proof when a PR is in context | UI E2E unless asked |
 | | PR create unless PR adds Playwright tests |
 
@@ -53,7 +53,7 @@ docker start app-redis-local 2>/dev/null || \
 docker exec app-redis-local redis-cli ping   # PONG
 ```
 
-Full `docker run` for MySQL: `mysql-insert` [reference.md](../mysql-insert/reference.md).
+Full `docker run` for MySQL: `local-docker-mysql` [reference.md](../local-docker-mysql/reference.md).
 
 ### Local connection rules (do not point at staging)
 
@@ -69,7 +69,7 @@ Full `docker run` for MySQL: `mysql-insert` [reference.md](../mysql-insert/refer
 - [ ] 1. Docker daemon up
 - [ ] 2. app-mysql-local healthy on 3306
 - [ ] 3. app-redis-local healthy on 6379 (PONG)
-- [ ] 4. Seed JSON ready (mysql-insert) + body mapping
+- [ ] 4. Seed JSON ready (local-docker-mysql) + body mapping
 - [ ] 5. API listening on local Docker MySQL + Redis (one probe OR Playwright — not both on same consumed seed)
 - [ ] 6. Run: npx playwright test tests/<spec>.ts --reporter=list,html
 - [ ] 7. Write playwright-report/result.html using the Result report format
@@ -79,7 +79,7 @@ Full `docker run` for MySQL: `mysql-insert` [reference.md](../mysql-insert/refer
 
 ## Result report format (mandatory)
 
-**Whenever local testing finishes** (Playwright and/or local API probe after `mysql-insert` seed), always produce this report:
+**Whenever local testing finishes** (Playwright and/or local API probe after `local-docker-mysql` seed), always produce this report:
 
 1. In chat (after the short pass/fail line)
 2. In `playwright-report/result.html`

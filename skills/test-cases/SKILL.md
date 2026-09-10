@@ -214,7 +214,7 @@ Always show:
 | [`business-process`](../business-process/) | Journey map + ACs → feed this skill |
 | [`playwright-local-api-test`](../playwright-local-api-test/) | Automate selected API cases after cases exist |
 | [`unit-test`](../unit-test/) | Automated in-process unit tests (table-driven code), not QA checklists |
-| [`mysql-insert`](../mysql-insert/) | Seed data for cases that need DB fixtures |
+| [`local-docker-mysql`](../local-docker-mysql/) | Seed data for cases that need DB fixtures |
 
 ---
 

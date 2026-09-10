@@ -5,7 +5,7 @@ description: >-
   local Docker MySQL for API and integration tests. Use when seeding fixtures,
   mysql-insert-style SQL, local MySQL, ticket-scoped data checks, or preflight
   before Playwright. Prefer short verify JSON for downstream tools. When local
-  API testing follows, hand off to playwright-local-api-test for the mandatory
+  API testing follows, hand off to python-local-api-test for the mandatory
   result report. Never use remote staging or production MySQL unless the user
   explicitly overrides. (Replaces the former mysql-insert skill.)
 ---
@@ -17,7 +17,7 @@ description: >-
 1. **Reuse** prior seed IDs/paths under `/tmp/*-seed.json` when still valid — do not re-discover the whole schema.
 2. **Do not** dump DB passwords into chat, HTML reports, or PR/issue comments.
 3. **One** discovery round → insert → verify; stop on success.
-4. **Local Docker only** — default MySQL `app-mysql-local` on `127.0.0.1:3306`. Pair with `local-docker-redis` (`app-redis-local`) when Playwright/API needs cache. Never cloud DB proxies or remote staging/prod.
+4. **Local Docker only** — default MySQL `app-mysql-local` on `127.0.0.1:3306`. Pair with `local-docker-redis` (`app-redis-local`) when API needs cache. Never cloud DB proxies or remote staging/prod.
 5. Parse local env files with **Python** — never `source` in zsh.
 6. Long Docker / DBeaver / SQL recipes → [reference.md](reference.md).
 
@@ -27,7 +27,7 @@ description: >-
 |-----|------|
 | Start / ping / inspect local MySQL | Unit tests with mocks only |
 | Seed / INSERT / DBeaver SQL against **local Docker MySQL** | Staging / production unless user explicitly asks |
-| Prep data for Playwright local API | PR create unless PR adds SQL/Docker seed docs |
+| Prep data for Python local API | PR create unless PR adds SQL/Docker seed docs |
 | Ticket-scoped `SELECT` across seed tags | Non-SQL stores → other `local-docker-*` skills |
 
 ## Defaults (rename per project — keep Docker and `.env*` in sync)
@@ -107,7 +107,7 @@ docker exec app-mysql-local mysql -uapp -papp_local app_local -e \
 2. Seed JSON path + key fields  
 3. Cleanup SQL (only if useful)
 
-When work continues into a **local API / Playwright** run, follow `playwright-local-api-test` and **always** deliver that skill’s result report format (chat + `result.html`; auto PR comment when a PR is in context).
+When work continues into a **local API** run, follow `python-local-api-test` and **always** deliver that skill’s result report format (chat + `result.html`; auto PR comment when a PR is in context).
 
 ## Related skills
 
@@ -116,7 +116,7 @@ When work continues into a **local API / Playwright** run, follow `playwright-lo
 | `local-docker-redis` | Cache companion for API tests |
 | `local-docker-dynamodb` | Local Dynamo when the case needs it |
 | `local-docker-firestore` | Firestore emulator when the case needs it |
-| `playwright-local-api-test` | Local API probe + result report |
+| `python-local-api-test` | Local API probe + result report |
 
 ## Forbidden (unless user explicitly overrides)
 

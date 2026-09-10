@@ -97,7 +97,7 @@ Many cases are MySQL/Redis-only — an unused emulator is fine; still report hea
 | Skill | Role |
 |-------|------|
 | `local-docker-mysql` / `local-docker-redis` / `local-docker-dynamodb` | Other local stores |
-| `playwright-local-api-test` | Local API + result report |
+| `python-local-api-test` | Local API + result report |
 
 ## Forbidden (unless user explicitly overrides)
 

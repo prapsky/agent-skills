@@ -82,7 +82,7 @@ docker exec app-redis-local redis-cli FLUSHDB
 | Skill | Role |
 |-------|------|
 | `local-docker-mysql` | Relational seed companion |
-| `playwright-local-api-test` | Local API + result report |
+| `python-local-api-test` | Local API + result report |
 | `local-docker-dynamodb` / `local-docker-firestore` | Other local stores |
 
 ## Forbidden (unless user explicitly overrides)

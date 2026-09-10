@@ -19,7 +19,8 @@ Before creating any Pull Request:
    - `unit-test` — when the PR adds/changes unit tests (table-driven)
    - `code-review` — optional self-check before/after open
    - `local-docker-mysql` / `local-docker-redis` / `local-docker-dynamodb` / `local-docker-firestore` — only if the PR adds/changes those local-store skills or Docker seed recipes
-   - `playwright-local-api-test` — only if the PR adds/changes Playwright API tests
+   - `python-local-api-test` — only if the PR adds/changes local Python API probe scripts
+   - `playwright-local-api-test` — only if the PR adds/changes Playwright UI tests (not HTTP API)
    - Any other project skill that clearly applies to the diff
 3. Apply those skills to the branch/diff before opening the PR.
 4. Prefer the project’s documented PR template when one exists (e.g. `PULL_REQUEST_TEMPLATE.md`, contributing docs). Do not invent a conflicting format.

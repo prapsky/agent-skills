@@ -19,7 +19,7 @@ description: >-
 ## When not to use
 
 - Authoring the full **business process overview** HTML → use [`business-process`](../business-process/)
-- Running automated Playwright API tests → use [`playwright-local-api-test`](../playwright-local-api-test/)
+- Running automated Python API tests → use [`python-local-api-test`](../python-local-api-test/)
 - Writing automated unit/integration **code** tests → use [`unit-test`](../unit-test/)
 
 ## Goals
@@ -212,7 +212,7 @@ Always show:
 | Skill | Relationship |
 |-------|----------------|
 | [`business-process`](../business-process/) | Journey map + ACs → feed this skill |
-| [`playwright-local-api-test`](../playwright-local-api-test/) | Automate selected API cases after cases exist |
+| [`python-local-api-test`](../python-local-api-test/) | Automate selected API cases with Python after cases exist |
 | [`unit-test`](../unit-test/) | Automated in-process unit tests (table-driven code), not QA checklists |
 | [`local-docker-mysql`](../local-docker-mysql/) | Seed data for cases that need DB fixtures |
 

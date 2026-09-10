@@ -16,7 +16,8 @@ description: >-
 2. Every AWS CLI/SDK call must include the local endpoint (or `DYNAMODB_ENDPOINT` / equivalent).
 3. **Do not** print AWS access keys in chat or reports; dummy local keys are fine.
 4. Create tables from the **project’s real key schema** — do not invent attributes that diverge from code.
-5. Long recipes → [reference.md](reference.md).
+5. **Phones / string IDs** in items → [`test-data-conventions`](../test-data-conventions/SKILL.md).
+6. Long recipes → [reference.md](reference.md).
 
 ## When to use / skip
 
@@ -82,6 +83,7 @@ aws dynamodb scan --table-name <TableName> \
 
 | Skill | Role |
 |-------|------|
+| `test-data-conventions` | Phone `+6285YYMMDDxxx` + UUID string IDs |
 | `local-docker-mysql` / `local-docker-redis` | Common API companions |
 | `local-docker-firestore` | Document store emulator |
 | `python-local-api-test` | Local API + result report |

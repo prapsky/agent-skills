@@ -75,9 +75,12 @@ Do **not** print passwords in chat or reports.
 Replace table/column/name literals with the project’s real schema:
 
 ```sql
+-- New string PKs: valid UUIDs (see test-data-conventions)
+-- Phones: +6285YYMMDDxxx, or 6285… without + when the column stores digits only
+-- Example first phone on 11 Sep 2026: +6285260911001 / 6285260911001
 INSERT INTO <table> (<cols…>)
 SELECT
-  '<seed-id>', …, parent.id, …
+  'a3f1c2e4-9b8d-4e2a-91f0-7c6d5b4a3210', …, parent.id, …
 FROM <fk_table> parent
 WHERE parent.<unique_name_col> = '<known-fixture-name>'
 LIMIT 1;
@@ -108,7 +111,7 @@ docker exec -i app-mysql-local mysql -uapp -papp_local app_local < /tmp/app_loca
 
 ## Empty DB
 
-If there are no tables, apply a **minimal** schema for the case or load a local dump — do not invent production-like UUIDs for FKs; discover or insert lookup rows first.
+If there are no tables, apply a **minimal** schema for the case or load a local dump — do not invent UUIDs for **FKs**; discover or insert lookup rows first. New **primary-key** string ids should still be valid UUIDs (`test-data-conventions`).
 
 ## Related
 

@@ -19,7 +19,8 @@ description: >-
 3. **One** discovery round → insert → verify; stop on success.
 4. **Local Docker only** — default MySQL `app-mysql-local` on `127.0.0.1:3306`. Pair with `local-docker-redis` (`app-redis-local`) when API needs cache. Never cloud DB proxies or remote staging/prod.
 5. Parse local env files with **Python** — never `source` in zsh.
-6. Long Docker / DBeaver / SQL recipes → [reference.md](reference.md).
+6. **New phones / string IDs** → follow [`test-data-conventions`](../test-data-conventions/SKILL.md) (`+6285YYMMDDxxx`, valid UUID PKs; discover FKs by name).
+7. Long Docker / DBeaver / SQL recipes → [reference.md](reference.md).
 
 ## When to use / skip
 
@@ -48,10 +49,11 @@ description: >-
 - [ ] 3. Docker Redis up when pairing with Playwright → follow local-docker-redis
 - [ ] 4. Align service local env to 127.0.0.1:3306 (match MYSQL_*)
 - [ ] 5. Target table + required columns (ask only if missing)
-- [ ] 6. Discovery SELECT for FKs by real unique keys (no invented UUIDs)
-- [ ] 7. INSERT (prefer INSERT…SELECT) + verify SELECT
-- [ ] 8. Write /tmp/<case>-seed.json (no secrets)
-- [ ] 9. Cleanup DELETE only if user asks
+- [ ] 6. Discovery SELECT for FKs by real unique keys (do not invent FK UUIDs)
+- [ ] 7. New string PKs = valid UUIDs; new phones = +6285YYMMDDxxx (or 6285… without + when the store requires it)
+- [ ] 8. INSERT (prefer INSERT…SELECT) + verify SELECT
+- [ ] 9. Write /tmp/<case>-seed.json (no secrets)
+- [ ] 10. Cleanup DELETE only if user asks
 ```
 
 ## Start + health
@@ -91,6 +93,7 @@ Keep table/column recipes **project-specific** in chat or a short case note — 
 
 - Discover FK ids with `SELECT … WHERE <unique_name_col> = …`.
 - Prefer `INSERT … SELECT` so FK lookups stay correct.
+- New primary-key string ids and phones → [`test-data-conventions`](../test-data-conventions/SKILL.md).
 - Tag rows (`remarks` / equivalent) as `seed:<ticket-or-case>` when the schema allows.
 - Only `DELETE` seed rows when the user asks.
 
@@ -113,6 +116,7 @@ When work continues into a **local API** run, follow `python-local-api-test` and
 
 | Skill | Role |
 |-------|------|
+| `test-data-conventions` | Phone `+6285YYMMDDxxx` + UUID string IDs |
 | `local-docker-redis` | Cache companion for API tests |
 | `local-docker-dynamodb` | Local Dynamo when the case needs it |
 | `local-docker-firestore` | Firestore emulator when the case needs it |

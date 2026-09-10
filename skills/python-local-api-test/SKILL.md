@@ -17,7 +17,8 @@ description: >-
 3. **Do not** call a mutating endpoint twice on the same consumed seed without reseed.
 4. **Local Docker only** — at minimum `app-mysql-local` + `app-redis-local`; add Dynamo/Firestore when needed. Never cloud DB proxies or remote staging stores.
 5. Parse local env files / mint JWTs with **Python** — never `source` in zsh; never print secrets.
-6. Keep the chat lead-in short (pass/fail + URL), then **always** append the [Result report format](#result-report-format-mandatory).
+6. **New phones / string IDs** in bodies or seeds → [`test-data-conventions`](../test-data-conventions/SKILL.md) (`+6285YYMMDDxxx`, valid UUIDs).
+7. Keep the chat lead-in short (pass/fail + URL), then **always** append the [Result report format](#result-report-format-mandatory).
 
 ## When to use / skip
 
@@ -156,6 +157,7 @@ Notes:
 
 | Skill | Role |
 |-------|------|
+| `test-data-conventions` | Phone `+6285YYMMDDxxx` + UUID string IDs |
 | `local-docker-mysql` / `redis` / `dynamodb` / `firestore` | Seed + preflight |
 | `playwright-local-api-test` (legacy name) | **UI only** — redirect API work here |
 

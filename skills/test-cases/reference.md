@@ -100,7 +100,9 @@ If embedding beside a business-process page, reuse its palette. Minimal hints:
 ```html
 <p class="note">
   <strong>Tester tip:</strong> Use a clean staging account per run.
-  Prefer dedicated test phones/emails. Reset or isolate data before negative
+  Prefer dedicated test phones/emails — phones use
+  <code>+6285YYMMDDxxx</code> (today’s date + increment; see
+  <code>test-data-conventions</code>). Reset or isolate data before negative
   duplicate cases. Confirm feature flags match the scenario (on vs off).
 </p>
 ```

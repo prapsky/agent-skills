@@ -18,7 +18,7 @@ description: >-
 ## When not to use
 
 - QA journey checklists / Given–When–Then docs → [`test-cases`](../test-cases/)
-- Local Playwright API checks with seed data → [`playwright-local-api-test`](../playwright-local-api-test/)
+- Local Python API checks with seed data → [`python-local-api-test`](../python-local-api-test/)
 - Changing production behavior unless the user also asked for a code fix
 
 **Analogy:** Unit tests are a **checklist of inputs → expected outputs**. Prefer one table you can scan in 30 seconds over many separate essays.
@@ -144,7 +144,7 @@ When asked to “make it table-driven”:
 | Skill | Relationship |
 |-------|----------------|
 | [`test-cases`](../test-cases/) | Human QA checklist → may inspire unit cases; not a substitute |
-| [`playwright-local-api-test`](../playwright-local-api-test/) | HTTP-level local check; unit tests stay in-process |
+| [`python-local-api-test`](../python-local-api-test/) | HTTP-level local Python check; unit tests stay in-process |
 | [`code-review`](../code-review/) | Reviewers often ask for table-driven coverage — use this to add it |
 | [`answer-code-reviews`](../answer-code-reviews/) | If review says “make table-driven”, fix with this skill then reply |
 

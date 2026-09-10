@@ -84,7 +84,7 @@ aws dynamodb scan --table-name <TableName> \
 |-------|------|
 | `local-docker-mysql` / `local-docker-redis` | Common API companions |
 | `local-docker-firestore` | Document store emulator |
-| `playwright-local-api-test` | Local API + result report |
+| `python-local-api-test` | Local API + result report |
 
 ## Forbidden (unless user explicitly overrides)
 

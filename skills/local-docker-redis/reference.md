@@ -65,4 +65,4 @@ When Redis is part of a multi-store case, record in `/tmp/<case>-seed.json`:
 ## Related
 
 - Sibling skills: `local-docker-mysql`, `local-docker-dynamodb`, `local-docker-firestore`
-- Often paired with `playwright-local-api-test`
+- Often paired with `python-local-api-test`

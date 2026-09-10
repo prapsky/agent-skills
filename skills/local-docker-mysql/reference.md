@@ -113,4 +113,4 @@ If there are no tables, apply a **minimal** schema for the case or load a local 
 ## Related
 
 - Sibling skills: `local-docker-redis`, `local-docker-dynamodb`, `local-docker-firestore`
-- API reporting: `playwright-local-api-test`
+- API reporting: `python-local-api-test`

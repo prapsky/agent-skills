@@ -58,4 +58,4 @@ All official clients honor `FIRESTORE_EMULATOR_HOST` when set before client cons
 ## Related
 
 - Sibling skills: `local-docker-mysql`, `local-docker-redis`, `local-docker-dynamodb`
-- Pair with `playwright-local-api-test` when exercising HTTP APIs that read Firestore
+- Pair with `python-local-api-test` when exercising HTTP APIs that read Firestore

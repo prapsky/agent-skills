@@ -4,44 +4,43 @@
 
 | Do | Do not |
 |----|--------|
-| Docker MySQL `fithub-mysql-local` on `127.0.0.1:3306` | `~/bin/cloud-sql-proxy` |
-| Docker Redis `fithub-redis-local` on `127.0.0.1:6379` | Staging Redis IPs / passwords |
-| Seed via `mysql-insert` against Docker MySQL | Staging Cloud SQL (`fit-hub-staging:…`) |
-| Load `.env.testing` already aligned to local Docker | Port **3307** proxy to staging |
+| Docker MySQL `app-mysql-local` on `127.0.0.1:3306` | Cloud DB proxy to remote staging |
+| Docker Redis `app-redis-local` on `127.0.0.1:6379` | Remote staging Redis hosts / passwords |
+| Seed via `mysql-insert` against Docker MySQL | Seeding or testing against remote staging DBs |
+| Load local env aligned to Docker | Tunnel ports used only to reach remote DBs |
 
 ### Start MySQL
 
 ```bash
-docker start fithub-mysql-local 2>/dev/null || \
-docker run -d --name fithub-mysql-local \
-  -e MYSQL_DATABASE=fithub-local \
-  -e MYSQL_USER=fithub \
-  -e MYSQL_PASSWORD=fithub_local \
-  -e MYSQL_ROOT_PASSWORD=fithub_root_local \
+docker start app-mysql-local 2>/dev/null || \
+docker run -d --name app-mysql-local \
+  -e MYSQL_DATABASE=app_local \
+  -e MYSQL_USER=app \
+  -e MYSQL_PASSWORD=app_local \
+  -e MYSQL_ROOT_PASSWORD=app_root_local \
   -p 3306:3306 \
   mysql:8.0 \
   --default-authentication-plugin=mysql_native_password
 
-docker exec fithub-mysql-local mysqladmin ping -h 127.0.0.1 -uroot -pfithub_root_local --silent
+docker exec app-mysql-local mysqladmin ping -h 127.0.0.1 -uroot -papp_root_local --silent
 ```
 
 ### Start Redis
 
 ```bash
-docker start fithub-redis-local 2>/dev/null || \
-docker run -d --name fithub-redis-local -p 6379:6379 redis:7-alpine
+docker start app-redis-local 2>/dev/null || \
+docker run -d --name app-redis-local -p 6379:6379 redis:7-alpine
 
-docker exec fithub-redis-local redis-cli ping
+docker exec app-redis-local redis-cli ping
 # expect: PONG
 ```
 
-### Env (already in `.env.testing`)
+### Env
 
-| Service | MySQL | Redis |
-|---------|-------|-------|
-| BACKEND-GOLANG | TCP + whitelist → `127.0.0.1:3306` / `fithub-local` | `127.0.0.1:6379`, empty password |
-| free-trial-service | `CONNECTION_TYPE=tcp` → same Docker MySQL | same |
-| lms-service | master `CONNECTION_TYPE=private` → `@tcp` same Docker MySQL | same |
+| Concern | Local value |
+|---------|-------------|
+| MySQL | TCP → `127.0.0.1:3306` / match Docker `MYSQL_*` |
+| Redis | `127.0.0.1:6379`, empty password by default |
 
 Seed / more detail: `mysql-insert` skill + its `reference.md`.
 
@@ -49,20 +48,16 @@ Seed / more detail: `mysql-insert` skill + its `reference.md`.
 
 Include: PASSED/FAILED, endpoint, seed (no secrets), request, status, response, one-line explanation, link to `./index.html`, ISO time.
 
-## Seed → body (free-trial)
+## Seed → body
 
-| Seed | Body |
-|------|------|
-| `club` | `locationUser` |
-| `phone` / `email` / `leadsName` | same fields |
-| omit `dealDate` | exercises empty Dynamo `dealDate` path |
+Map fields from `/tmp/<case>-seed.json` to the API request body using the endpoint’s contract. Keep the mapping in the spec or `/tmp/<case>-body.json` — do not hard-code one product’s field names in this skill.
 
 ## Run
 
 ```bash
-cd "BE - BACKEND-GOLANG/playwright/local-api"
-PW_BASE_URL='http://127.0.0.1:5005' \
-PW_PATH='/v1/leads/free-trial' \
+cd "<repo>/playwright/local-api"   # or the repo’s existing Playwright API folder
+PW_BASE_URL='http://127.0.0.1:<port>' \
+PW_PATH='/<api-path>' \
 PW_SEED_JSON="$(cat /tmp/<case>-seed.json)" \
 PW_BODY_JSON="$(cat /tmp/<case>-body.json)" \
 npx playwright test tests/<spec>.ts --reporter=list,html
@@ -71,12 +66,12 @@ npx playwright test tests/<spec>.ts --reporter=list,html
 ## Pairing with `mysql-insert`
 
 1. Docker daemon up  
-2. `fithub-mysql-local` + `fithub-redis-local` healthy  
+2. `app-mysql-local` + `app-redis-local` healthy  
 3. Seed + `/tmp/<case>-seed.json`  
 4. Map body → `/tmp/<case>-body.json`  
-5. Start API once against local Docker; run Playwright **or** curl — not both without reseed  
+5. Start API once against local Docker; run Playwright **or** curl — not both without reseed when the first call consumes the fixture  
 6. `result.html` + optional PR comment  
 
 ## Cleanup
 
-Only if user asks: `DELETE FROM leads WHERE remarks LIKE 'seed:%';`
+Only if user asks: delete rows tagged as seeds (project-specific SQL).

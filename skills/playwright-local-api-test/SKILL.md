@@ -27,3 +27,5 @@ Redirect immediately to **`python-local-api-test`**. Do not run Playwright for H
 ## Notes
 
 Legacy folder name `playwright-local-api-test` remains for compatibility; treat as UI-oriented.
+
+When UI flows **create** phones or string IDs, follow [`test-data-conventions`](../test-data-conventions/SKILL.md) (`+6285YYMMDDxxx`, valid UUIDs).

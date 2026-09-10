@@ -22,6 +22,7 @@ agent-skills/
     ├── playwright-local-api-test/
     ├── python-local-api-test/
     ├── test-cases/
+    ├── test-data-conventions/
     └── unit-test/
 ```
 
@@ -29,6 +30,7 @@ agent-skills/
 | --- | --- |
 | [`business-process`](skills/business-process/) | Author a standalone non-technical business-process overview HTML (FE↔BE, systems, infra inventory). |
 | [`test-cases`](skills/test-cases/) | Author positive/negative QA test cases (HTML or Markdown) from use cases and acceptance criteria. |
+| [`test-data-conventions`](skills/test-data-conventions/) | Synthetic phones (`+6285YYMMDDxxx` from today’s date) and valid UUID string IDs for seeds/fixtures. |
 | [`unit-test`](skills/unit-test/) | Write or rewrite automated unit tests as table-driven cases (match package style, run focused tests). |
 | [`code-review`](skills/code-review/) | Formal PR/branch review against agreed docs, with a clear Yes/No merge verdict (optional GitHub post). |
 | [`answer-code-reviews`](skills/answer-code-reviews/) | Address PR review feedback: fix, commit/push, reply on each finding, resolve threads. |

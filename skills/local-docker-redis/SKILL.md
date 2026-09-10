@@ -16,7 +16,8 @@ description: >-
 2. **Do not** print Redis passwords in chat or reports (default local has none).
 3. Prefer `--scan` over `KEYS *` on large DBs.
 4. Tag seeded keys with `seed:<ticket-or-case>:…` so cleanup and inspect stay safe.
-5. Long recipes → [reference.md](reference.md).
+5. **Phones / string IDs** in keys or payloads → [`test-data-conventions`](../test-data-conventions/SKILL.md).
+6. Long recipes → [reference.md](reference.md).
 
 ## When to use / skip
 
@@ -81,6 +82,7 @@ docker exec app-redis-local redis-cli FLUSHDB
 
 | Skill | Role |
 |-------|------|
+| `test-data-conventions` | Phone `+6285YYMMDDxxx` + UUID string IDs |
 | `local-docker-mysql` | Relational seed companion |
 | `python-local-api-test` | Local API + result report |
 | `local-docker-dynamodb` / `local-docker-firestore` | Other local stores |

@@ -163,3 +163,4 @@ When asked to “make it table-driven”:
 ## Additional resources
 
 - Before/after Go examples and anti-patterns: [reference.md](reference.md)
+- When fixtures invent phones or string IDs → [`test-data-conventions`](../test-data-conventions/SKILL.md)

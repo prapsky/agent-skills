@@ -215,6 +215,7 @@ Always show:
 | [`python-local-api-test`](../python-local-api-test/) | Automate selected API cases with Python after cases exist |
 | [`unit-test`](../unit-test/) | Automated in-process unit tests (table-driven code), not QA checklists |
 | [`local-docker-mysql`](../local-docker-mysql/) | Seed data for cases that need DB fixtures |
+| [`test-data-conventions`](../test-data-conventions/) | Synthetic phones (`+6285YYMMDDxxx`) and UUID string IDs |
 
 ---
 

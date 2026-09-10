@@ -17,7 +17,8 @@ description: >-
 2. Client SDKs and services **must** see the emulator host env; empty host usually means **real Firestore**.
 3. **Do not** print service-account private keys in chat or reports.
 4. Seed collection/document paths from the **project’s real code** — do not invent unrelated hierarchies.
-5. Long recipes → [reference.md](reference.md).
+5. **Phones / string IDs** in docs → [`test-data-conventions`](../test-data-conventions/SKILL.md).
+6. Long recipes → [reference.md](reference.md).
 
 ## When to use / skip
 
@@ -96,6 +97,7 @@ Many cases are MySQL/Redis-only — an unused emulator is fine; still report hea
 
 | Skill | Role |
 |-------|------|
+| `test-data-conventions` | Phone `+6285YYMMDDxxx` + UUID string IDs |
 | `local-docker-mysql` / `local-docker-redis` / `local-docker-dynamodb` | Other local stores |
 | `python-local-api-test` | Local API + result report |
 

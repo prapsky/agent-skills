@@ -18,6 +18,7 @@ description: >-
 3. **One** discovery round → insert → verify; stop on success.
 4. **Local Docker only** — MySQL (`app-mysql-local`) and Redis (`app-redis-local`). Never cloud DB proxies, remote staging DB/Redis, or ad-hoc tunnel ports used only for remote DBs.
 5. Long SQL / Docker recipes → [reference.md](reference.md) only when needed.
+6. Broader MySQL start/inspect/ticket checks → also `local-docker-mysql`. Redis/Dynamo/Firestore → `local-docker-redis` / `local-docker-dynamodb` / `local-docker-firestore`.
 
 ## When to use / skip
 

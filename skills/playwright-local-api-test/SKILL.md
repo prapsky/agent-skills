@@ -16,7 +16,7 @@ description: >-
 1. **Reuse** the repo’s existing `playwright/local-api/` (or equivalent) folder — do not scaffold a new project.
 2. **Reuse** `/tmp/<case>-seed.json` + `/tmp/<case>-body.json` from `mysql-insert`.
 3. **Do not** curl a mutating endpoint and then run Playwright on the **same** consumed seed without reseed (second call may hang/time out).
-4. **Local Docker MySQL + Redis only** — `app-mysql-local` + `app-redis-local`. Never cloud DB proxies or remote staging DB/Redis. See `mysql-insert` + [reference.md](reference.md).
+4. **Local Docker MySQL + Redis** — `app-mysql-local` + `app-redis-local`; also start Dynamo/Firestore via `local-docker-dynamodb` / `local-docker-firestore` when the case needs them. Never cloud DB proxies or remote staging stores. See `mysql-insert`, `local-docker-mysql`, `local-docker-redis`, + [reference.md](reference.md).
 5. Keep the chat lead-in short (pass/fail + URLs), then **always** append the [Result report format](#result-report-format-mandatory). Details → [reference.md](reference.md).
 
 ## When to use / skip

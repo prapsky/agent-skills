@@ -1,95 +1,95 @@
 ---
 name: mysql-insert
 description: >-
-  Generate safe, DBeaver-ready MySQL INSERT/seed SQL. Use when the user asks
-  for MySQL insert queries, seed data, staging/local fixtures, or DBeaver SQL.
+  Generate or run safe local Docker MySQL seed SQL (DBeaver-ready), and ensure
+  local Docker Redis is available for Playwright API tests. Use when seeding
+  fixtures, mysql-insert, DBeaver SQL, or preparing data for Playwright local
+  API tests. Prefer short verify JSON for downstream tools. Never use staging
+  Cloud SQL or staging Redis.
 ---
 
 # MySQL insert
 
-## When to use
+## Token rules (do these first)
 
-- User wants MySQL `INSERT` / seed SQL
-- User mentions DBeaver and needs copy-paste insert statements
+1. **Reuse** prior seed IDs/paths under `/tmp/*-seed.json` when still valid — do not re-discover the whole schema.
+2. **Do not** dump `.env` / passwords into chat or reports.
+3. **One** discovery round → insert → verify; stop on success.
+4. **Local Docker only** — MySQL (`fithub-mysql-local`) and Redis (`fithub-redis-local`). Never Cloud SQL proxy, staging DB/Redis, `fit-hub-staging`, or port **3307**.
+5. Long SQL / Docker recipes → [reference.md](reference.md) only when needed.
 
-## When not to use
+## When to use / skip
 
-- Production writes unless the user **explicitly** asks for production
-- Running inserts with `.env` credentials unless the user asks to execute
-- Firestore / Dynamo / API setup (out of scope — MySQL only)
-- During PR creation: **skip** unless the PR adds/changes SQL seed scripts
+| Use | Skip |
+|-----|------|
+| Seed / INSERT / DBeaver SQL against **local Docker MySQL** | Staging / production unless user explicitly asks |
+| Prep data for Playwright local API (MySQL seed; Redis must be up) | PR create unless PR adds SQL seeds |
+| Start / verify local Docker MySQL + Redis | Firestore / Dynamo setup |
 
-## Goals
-
-1. Copy-paste SQL that works in **DBeaver** (prefer one statement).
-2. Resolve foreign keys with `JOIN` / subqueries — do not invent IDs.
-3. Include discovery → insert → verify → cleanup.
-
-## Workflow
+## Checklist
 
 ```
-- [ ] 1. Clarify table, columns, and values
-- [ ] 2. Discovery SELECT (FK lookups non-NULL)
-- [ ] 3. INSERT (prefer INSERT … SELECT when FKs needed)
-- [ ] 4. Verify SELECT
-- [ ] 5. Cleanup DELETE
+- [ ] 1. Docker daemon running (Docker Desktop or Colima)
+- [ ] 2. Docker MySQL up on 127.0.0.1:3306 (fithub-mysql-local)
+- [ ] 3. Docker Redis up on 127.0.0.1:6379 (fithub-redis-local) — required when pairing with Playwright
+- [ ] 4. Target table + required columns (ask only if missing)
+- [ ] 5. Discovery SELECT for FKs by name (no invented UUIDs)
+- [ ] 6. INSERT (prefer INSERT…SELECT) + verify SELECT
+- [ ] 7. Write seed JSON to /tmp/<case>-seed.json (no secrets)
+- [ ] 8. Cleanup DELETE only if user asks
 ```
 
-### 1. Clarify
+## Local Docker stack (required)
 
-Ask only if missing: target DB/table, required columns, how to find FK rows (e.g. by name).
+Before seeding or Playwright:
 
-### 2. Discovery first
+| Container | Port | Purpose |
+|-----------|------|---------|
+| `fithub-mysql-local` | `3306` | Seed + API MySQL |
+| `fithub-redis-local` | `6379` | API cache (no password) |
 
-```sql
-SELECT id, <label_column>
-FROM <parent_table>
-WHERE <label_column> = '<known_value>'
-LIMIT 5;
-```
+Start commands and env alignment: [reference.md](reference.md).
 
-### 3. Prefer `INSERT … SELECT` when FKs exist
+Match `.env.testing` in **BACKEND-GOLANG**, **free-trial-service**, and **lms-service** (already pointed at this stack).
 
-Avoid multi-statement `SET @var = …` as the default (DBeaver often errors with `1064` near `SET`).
+## Execute against local Docker MySQL
 
-```sql
-INSERT INTO <child_table> (id, parent_id, name, created_at)
-SELECT
-  '<new-id>',
-  p.id,
-  'Seed Name',
-  UNIX_TIMESTAMP()
-FROM <parent_table> p
-WHERE p.<label_column> = '<known_value>'
-LIMIT 1;
-```
+When the user asks to **run** seeds (not just print SQL):
 
-For tables with no FKs, a plain `INSERT INTO … VALUES (…)` is fine.
+| Step | Rule |
+|------|------|
+| DB | **Docker MySQL only** — `fithub-mysql-local` |
+| Host/port | `127.0.0.1:3306`. Never `3307` / cloud-sql-proxy |
+| Creds | `fithub` / `fithub_local` / `fithub-local` (match Docker + `.env.testing`) |
+| Env | Parse `.env.testing` in Python — never `source` in zsh; never use Cloud SQL instance name |
+| Client | Homebrew `mysql` may fail auth plugin → `/tmp/.../venv` + **pymysql** |
+| Schema | If DB is empty, apply schema + FK lookup rows before INSERT |
+| Redis | Confirm `redis-cli ping` → `PONG` when work continues to Playwright |
+| Output | Print verify row + path to seed JSON only |
 
-### 4. Verify + cleanup
+### Forbidden (unless user explicitly overrides)
 
-```sql
-SELECT * FROM <table> WHERE id = '<new-id>';
+- `~/bin/cloud-sql-proxy`
+- `fit-hub-staging:asia-southeast1:fithub-db-staging`
+- Staging / production MySQL or Redis hosts
+- Seeding against remote staging IPs
 
-DELETE FROM <table> WHERE id = '<new-id>';
-```
+## `leads` free-trial recurring seed (common)
 
-## Security
+Required: `id`, **`parent_id` (= id)**, `club_id`, `phone`, `email`, `name`, `status_id`, `source_id`, `preferred_contact_time_id`, timestamps, `created_by`/`updated_by`.  
+Set `deal_at = NULL` to exercise empty Dynamo `dealDate`.  
+Mark `remarks` like `seed:<ticket-or-case>`.
 
-- Staging/local by default; warn before production SQL
-- Never paste DB passwords or commit secrets
-- Do not auto-run remote inserts unless the user asks
+FK gotchas (local Docker — same names as prod-like fixtures):
 
-## Output shape
+- Club: prefer **`FIT HUB BENHIL`** (ensure that club row exists locally).
+- Contact time name is **`Anytime`** (not `ANYTIME`).
+- Status table is **`leads_status`** (not `lead_status`).
 
-1. One-line what is being seeded  
-2. Discovery SQL  
-3. Insert SQL  
-4. Verify SQL  
-5. Cleanup SQL  
+## Output shape (chat)
 
-Keep it short. Use the user’s real table/column names when given.
+1. One line: what was seeded  
+2. Seed JSON path + key fields (`id`, `phone`, `club`)  
+3. Cleanup SQL (only if useful)
 
-## More patterns
-
-See [reference.md](reference.md).
+Details: [reference.md](reference.md).

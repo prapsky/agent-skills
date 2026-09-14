@@ -16,6 +16,7 @@ agent-skills/
     ├── code-review/
     ├── create-pull-request/
     ├── local-docker-dynamodb/
+    ├── local-docker-firebase-remote-config/
     ├── local-docker-firestore/
     ├── local-docker-mysql/
     ├── local-docker-pubsub/
@@ -41,10 +42,11 @@ agent-skills/
 | [`local-docker-dynamodb`](skills/local-docker-dynamodb/) | Start / tables / PutItem / scan for local DynamoDB (`app-dynamodb-local` → `:8000`). |
 | [`local-docker-firestore`](skills/local-docker-firestore/) | Start / seed / read for Firestore emulator (`app-firestore-local` → `:8080`). |
 | [`local-docker-pubsub`](skills/local-docker-pubsub/) | Start / topics / publish / pull for Pub/Sub emulator (`app-pubsub-local` → `:8085`, `PUBSUB_EMULATOR_HOST`). |
+| [`local-docker-firebase-remote-config`](skills/local-docker-firebase-remote-config/) | Seed / mock Firebase Remote Config for local feature flags (`app-firebase-rc-local` → `:9299` and/or Redis FF cache). |
 | [`python-local-api-test`](skills/python-local-api-test/) | Run local **HTTP API** tests with **Python** against Docker stores; always deliver the standard result report. Prefer this over Playwright for APIs. |
 | [`playwright-local-api-test`](skills/playwright-local-api-test/) | **UI / browser** Playwright only — redirect HTTP API work to `python-local-api-test`. |
 
-`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `local-docker-mysql` and `python-local-api-test` work together for relational API tests; add Redis/Dynamo/Firestore/Pub/Sub skills when those stores are in the path. Playwright is for UI only. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
+`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `local-docker-mysql` and `python-local-api-test` work together for relational API tests; add Redis/Dynamo/Firestore/Pub/Sub/Remote Config skills when those stores are in the path. Playwright is for UI only. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
 
 ## How a skill is structured
 
@@ -69,6 +71,7 @@ cp -R skills/local-docker-redis /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-dynamodb /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-firestore /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-pubsub /path/to/your-project/.cursor/skills/
+cp -R skills/local-docker-firebase-remote-config /path/to/your-project/.cursor/skills/
 cp -R skills/python-local-api-test /path/to/your-project/.cursor/skills/
 ```
 
@@ -113,11 +116,13 @@ flowchart LR
   U --> D[local-docker-dynamodb]
   U --> F[local-docker-firestore]
   U --> P[local-docker-pubsub]
+  U --> RC[local-docker-firebase-remote-config]
   M --> API[Local API / Playwright]
   R --> API
   D --> API
   F --> API
   P --> API
+  RC --> API
 ```
 
 ### Code review + answer feedback

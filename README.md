@@ -18,6 +18,7 @@ agent-skills/
     ├── local-docker-dynamodb/
     ├── local-docker-firestore/
     ├── local-docker-mysql/
+    ├── local-docker-pubsub/
     ├── local-docker-redis/
     ├── playwright-local-api-test/
     ├── python-local-api-test/
@@ -39,10 +40,11 @@ agent-skills/
 | [`local-docker-redis`](skills/local-docker-redis/) | Start / health-check / seed keys / scan for local Docker Redis (`app-redis-local`). |
 | [`local-docker-dynamodb`](skills/local-docker-dynamodb/) | Start / tables / PutItem / scan for local DynamoDB (`app-dynamodb-local` → `:8000`). |
 | [`local-docker-firestore`](skills/local-docker-firestore/) | Start / seed / read for Firestore emulator (`app-firestore-local` → `:8080`). |
+| [`local-docker-pubsub`](skills/local-docker-pubsub/) | Start / topics / publish / pull for Pub/Sub emulator (`app-pubsub-local` → `:8085`, `PUBSUB_EMULATOR_HOST`). |
 | [`python-local-api-test`](skills/python-local-api-test/) | Run local **HTTP API** tests with **Python** against Docker stores; always deliver the standard result report. Prefer this over Playwright for APIs. |
 | [`playwright-local-api-test`](skills/playwright-local-api-test/) | **UI / browser** Playwright only — redirect HTTP API work to `python-local-api-test`. |
 
-`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `local-docker-mysql` and `python-local-api-test` work together for relational API tests; add Redis/Dynamo/Firestore skills when those stores are in the path. Playwright is for UI only. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
+`local-docker-*` skills are company-agnostic defaults (`app-*-local`). Rename containers/creds per project. `local-docker-mysql` and `python-local-api-test` work together for relational API tests; add Redis/Dynamo/Firestore/Pub/Sub skills when those stores are in the path. Playwright is for UI only. `code-review` and `answer-code-reviews` are a pair. `business-process` and `test-cases` are a pair. `test-cases` (human checklist) and `unit-test` (automated code tests) are different layers — do not swap them.
 
 ## How a skill is structured
 
@@ -66,6 +68,7 @@ cp -R skills/local-docker-mysql /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-redis /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-dynamodb /path/to/your-project/.cursor/skills/
 cp -R skills/local-docker-firestore /path/to/your-project/.cursor/skills/
+cp -R skills/local-docker-pubsub /path/to/your-project/.cursor/skills/
 cp -R skills/python-local-api-test /path/to/your-project/.cursor/skills/
 ```
 
@@ -109,10 +112,12 @@ flowchart LR
   U --> R[local-docker-redis]
   U --> D[local-docker-dynamodb]
   U --> F[local-docker-firestore]
+  U --> P[local-docker-pubsub]
   M --> API[Local API / Playwright]
   R --> API
   D --> API
   F --> API
+  P --> API
 ```
 
 ### Code review + answer feedback

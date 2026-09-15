@@ -4,6 +4,8 @@ Production-grade **skills** for AI coding agents (Cursor, Claude Code, Codex, an
 
 Think of each skill as a short playbook: when a task matches the skill’s description, the agent reads `SKILL.md` and follows that process instead of improvising.
 
+These skills follow [Anthropic’s skill-creator guidelines](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md): pushy descriptions (what + when), imperative workflows, progressive disclosure via `references/`, and lean `SKILL.md` files.
+
 ## What’s in this repo
 
 ```text
@@ -50,14 +52,21 @@ agent-skills/
 
 ## How a skill is structured
 
-Every skill folder follows the same shape:
+Every skill folder follows Anthropic-style progressive disclosure:
+
+```text
+skill-name/
+├── SKILL.md                 # Required — frontmatter + workflow (keep lean)
+└── references/              # Optional — deeper recipes loaded only when needed
+    └── reference.md
+```
 
 | File | Role |
 | --- | --- |
-| `SKILL.md` | Main instructions (YAML frontmatter + workflow). Agents load this first. |
-| `reference.md` | Deeper examples and notes. Open when `SKILL.md` points to it. |
+| `SKILL.md` | Main instructions (YAML `name` + pushy `description`, then imperative workflow). Agents load this when the skill triggers. |
+| `references/` | Deeper examples, SQL/CLI recipes, HTML/CSS skeletons. Open when `SKILL.md` points to them. |
 
-Frontmatter at the top of `SKILL.md` tells the agent **when** to use the skill (`name` + `description`).
+Frontmatter at the top of `SKILL.md` tells the agent **what** the skill does and **when** to use it. Descriptions include trigger phrases and near-miss redirects so skills fire at the right times.
 
 ## How to use these skills
 
@@ -155,10 +164,13 @@ sequenceDiagram
 
 ## Adding a new skill
 
+Follow Anthropic’s skill-creator loop: capture intent → draft → test with real prompts → review → improve description triggering.
+
 1. Create `skills/<skill-name>/`.
-2. Add `SKILL.md` with `name` and `description` frontmatter.
-3. Add `reference.md` when examples would clutter the main skill.
-4. Update this README’s skill table.
+2. Add `SKILL.md` with `name` and a pushy `description` (what it does **and** when to use it, plus near-miss redirects).
+3. Put deep recipes under `references/` and link them from `SKILL.md` (“read this when…”).
+4. Prefer imperative steps and explain *why*; keep `SKILL.md` under ~500 lines.
+5. Update this README’s skill table.
 
 Keep instructions short, safe by default (no production writes or secrets unless the user clearly asks), and easy for a non-expert to follow.
 

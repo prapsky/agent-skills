@@ -1,26 +1,36 @@
 ---
 name: test-cases
 description: >-
-  Author positive and negative test cases for a product journey or API across
-  channels (web, admin, mobile, etc.), as an HTML section or standalone file.
-  Use when the user asks for test cases, QA scenarios, Given–When–Then checks,
-  happy-path / negative coverage, or a test-case table for a business process.
+  Authors positive and negative test cases for a product journey or API across
+  channels, as an HTML section, standalone HTML, or Markdown table.
+  Trigger on: test cases, QA scenarios, Given-When-Then checks, happy path and
+  negative coverage, test case table, write test scenarios, test script for QA,
+  acceptance test cases, edge case coverage for QA, test IDs, channel test
+  matrix, QA checklist, test plan scenarios, write test cases for this flow,
+  negative test cases, validation scenarios, failure scenarios, QA coverage.
+  Not for automated unit tests → use unit-test instead.
+  Not for local Python API scripts → use python-local-api-test instead.
+  Not for the full business process overview → use business-process instead.
 ---
 
 # Test cases
 
 ## When to use
 
-- User wants **test cases** for a journey, feature, or API
-- Need **positive + negative** scenarios per channel (web, admin, app, partner, …)
-- Turning **acceptance criteria** (often Given–When–Then) into executable checks for QA
-- Adding a Test Cases section next to a `business-process` overview HTML
+- User wants **test cases** for a journey, feature, or API.
+- Need **positive + negative** scenarios per channel (web, admin, app, partner…).
+- Turning **acceptance criteria** (often Given–When–Then) into executable checks
+  for QA.
+- Adding a Test Cases section next to a `business-process` overview HTML.
 
 ## When not to use
 
-- Authoring the full **business process overview** HTML → use [`business-process`](../business-process/)
-- Running automated Python API tests → use [`python-local-api-test`](../python-local-api-test/)
-- Writing automated unit/integration **code** tests → use [`unit-test`](../unit-test/)
+- Authoring the full **business process overview** HTML → use
+  [`business-process`](../business-process/).
+- Running automated Python API tests → use
+  [`python-local-api-test`](../python-local-api-test/).
+- Writing automated unit/integration **code** tests → use
+  [`unit-test`](../unit-test/).
 
 ## Goals
 
@@ -29,7 +39,8 @@ description: >-
 3. Tie each case to a real **API / system** (or UI-only) when known.
 4. Deliver HTML and/or Markdown the team can paste into docs or a process page.
 
-**Analogy:** Test cases are the flight checklist — not the map of the whole trip (`business-process`), and not the autopilot script (automated tests).
+**Analogy:** Test cases are the flight checklist — not the map of the whole
+trip (`business-process`), and not the autopilot script (automated tests).
 
 ---
 
@@ -39,12 +50,13 @@ description: >-
 |-------|-----------|-------|
 | Process / feature name | Yes | What is being tested |
 | Channels | Yes | Only surfaces that participate |
-| Use cases + acceptance criteria | Recommended | Prefer Given–When–Then from the process/spec |
+| Use cases + acceptance criteria | Recommended | Prefer GWT from the process/spec |
 | Endpoints / systems | Recommended | From process HTML, OpenAPI, or code |
 | Output format | Ask if unclear | `html-section` · `standalone-html` · `markdown` (default: ask once) |
 | Output path | Yes | e.g. `{process}-test-cases.html` or embed path |
 
-If a `business-process` HTML already exists, read its use cases, FE↔BE flows, and endpoints first — do not invent APIs.
+When a `business-process` HTML already exists, read its use cases, FE↔BE flows,
+and endpoints first — do not invent APIs.
 
 ---
 
@@ -62,7 +74,8 @@ Business process / feature
 | Acceptance criteria | Pass/fail rules (prefer GWT) |
 | **Test case** | Steps a tester performs + expected result |
 
-One acceptance criterion may become several cases (happy path, validation error, auth fail, …).
+One acceptance criterion may become several cases (happy path, validation error,
+auth fail…).
 
 ### Given–When–Then → case fields
 
@@ -88,7 +101,8 @@ One acceptance criterion may become several cases (happy path, validation error,
 
 ### 1–2. Clarify and research
 
-Ask only if missing: channels, format, where to write the file. Prefer existing ACs over inventing scenarios.
+Ask only if missing: channels, format, where to write the file. Prefer existing
+ACs over inventing scenarios.
 
 ### 3. Draft with IDs
 
@@ -101,7 +115,8 @@ Ask only if missing: channels, format, where to write the file. Prefer existing 
 | Mobile app | `APP-01` |
 | Partner / other | Short uppercase code agreed with the user |
 
-Use the project’s real channel codes when they already exist; otherwise pick short stable prefixes and stay consistent.
+Use the project's real channel codes when they already exist; otherwise pick
+short stable prefixes and stay consistent.
 
 ### Types
 
@@ -112,10 +127,13 @@ Use the project’s real channel codes when they already exist; otherwise pick s
 
 ### Coverage expectations
 
-- At least one **end-to-end happy path** per participating channel
-- Negative cases for: missing fields, auth, duplicates, eligibility / gate blocks, expired or invalid states
-- Background effects (messaging, push, jobs, onboarding) as **separate cases** when they matter
-- End with a short **tester tip** (staging data, clean baseline accounts, feature flags)
+- At least one **end-to-end happy path** per participating channel.
+- Negative cases for: missing fields, auth, duplicates, eligibility / gate
+  blocks, expired or invalid states.
+- Background effects (messaging, push, jobs, onboarding) as **separate cases**
+  when they matter.
+- End with a short **tester tip** (staging data, clean baseline accounts,
+  feature flags).
 
 ---
 
@@ -148,11 +166,14 @@ Summary strip + table. CSS classes commonly used with process pages:
 | `.tc-table` | Case table |
 | `.pill.pos` / `.pill.neg` | Type badges |
 
-Place as its own numbered section (e.g. after FE↔BE / impact) when merging into a `business-process` HTML — renumber surrounding sections if needed.
+Place as its own numbered section (e.g. after FE↔BE / impact) when merging into
+a `business-process` HTML — renumber surrounding sections if needed.
 
 ### B. Standalone HTML
 
-Same table + summary + tester tip in a minimal self-contained page (reuse process-page CSS tokens if available; see [`business-process` reference](../business-process/reference.md)).
+Same table + summary + tester tip in a minimal self-contained page. Reuse
+process-page CSS tokens if available; see
+[`business-process` references](../business-process/references/reference.md).
 
 Suggested name: `{process-kebab}-test-cases.html`
 
@@ -170,17 +191,15 @@ Suggested name: `{process-kebab}-test-cases.html`
 **Tester tip:** …
 ```
 
-More HTML markup examples: [reference.md](reference.md).
-
 ---
 
 ## Summary strip
 
 Always show:
 
-- **Total** case count  
-- **Positive** / **Negative** counts  
-- **Per-channel** counts  
+- **Total** case count
+- **Positive** / **Negative** counts
+- **Per-channel** counts
 
 ---
 
@@ -189,8 +208,10 @@ Always show:
 1. Plain language — a new QA hire should run the case without reading the code.
 2. One primary outcome per case; split combined paths into separate IDs.
 3. Name real endpoints and systems after a plain-language scenario line.
-4. Mark async side effects clearly in **Expected result** (e.g. “message published to `{topic}`”).
-5. Never put secrets, real production PII, or passwords in cases — use placeholders.
+4. Mark async side effects clearly in **Expected result** (e.g. "message
+   published to `{topic}`").
+5. Never put secrets, real production PII, or passwords in cases — use
+   placeholders.
 
 ---
 
@@ -219,6 +240,7 @@ Always show:
 
 ---
 
-## Additional resources
+## References
 
-- HTML summary/table snippets and type pills: [reference.md](reference.md)
+HTML summary/table snippets and type pills:
+[references/reference.md](references/reference.md).

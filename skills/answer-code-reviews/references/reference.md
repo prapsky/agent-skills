@@ -1,12 +1,12 @@
 # answer-code-reviews — reference
 
-Companion to [SKILL.md](SKILL.md).
+Companion to [SKILL.md](../SKILL.md).
 
 ## Pair with `code-review`
 
 | Skill | Role |
 |-------|------|
-| [`code-review`](../code-review/) | Reviewer posts Yes/No + Must fix / Optional / After merge |
+| [`code-review`](../../code-review/) | Reviewer posts Yes/No + Must fix / Optional / After merge |
 | `answer-code-reviews` | Author fixes, replies, optionally resolves threads |
 
 Typical flow:

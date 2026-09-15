@@ -1,33 +1,41 @@
 ---
 name: answer-code-reviews
 description: >-
-  Handle GitHub PR review feedback end-to-end: read comments, fix code against
-  related requirements and acceptance criteria, run tests, commit and push,
-  reply on each finding, and resolve threads. Use when the user asks to answer
-  code reviews, address PR feedback, fix review comments, or respond to and
-  resolve review threads.
+  Handles GitHub PR review feedback end-to-end: reads comments, fixes code
+  against requirements and acceptance criteria, commits and pushes (when asked),
+  replies to each finding, and resolves threads.
+  Trigger on: answer code reviews, address PR feedback, fix review comments,
+  respond to review, resolve review threads, reply to reviewer, fix what the
+  reviewer said, address findings, handle PR comments, push fixes and reply,
+  reply to each finding, go through review feedback, tackle review comments,
+  fix review, answer the reviewer.
+  Not for writing a formal merge verdict → use code-review instead.
+  Not for local cleanup with no review threads → fix in place and open a PR later.
 ---
 
 # Answer code reviews
 
 ## What this skill does
 
-- Reads feedback on an **existing** GitHub PR
-- Loads **related agreement docs** when the PR links to them (spec, plan, requirements, ACs)
-- Fixes code (and tests) where needed
-- Commits and pushes to the **PR branch** when asked
-- Replies to **each** finding
-- Resolves threads when asked
+- Reads feedback on an **existing** GitHub PR.
+- Loads **related agreement docs** when the PR links to them (spec, plan,
+  requirements, ACs).
+- Fixes code and tests where needed.
+- Commits and pushes to the PR branch **when asked**.
+- Replies to **every** finding.
+- Resolves threads **when asked**.
 
-**Analogy:** A review is a punch list after inspection. This skill walks each item, fixes it, leaves a short note, and marks done.
+**Analogy:** A review is a punch list after inspection. Walk each item, fix it,
+leave a short note, and mark it done.
 
-**Pair skill:** [`code-review`](../code-review/) **writes** the formal review. This skill **responds** to it (and to any other reviewer feedback).
+**Pair skill:** [`code-review`](../code-review/) **writes** the formal review.
+This skill **responds** to it (and to any other reviewer feedback).
 
 ---
 
 ## Keep it short (required)
 
-When explaining a review to the user, **summarize first**. Do not paste or restate the full review body.
+Summarize the review first. Do not paste or restate the full review body.
 
 | Moment | What to say |
 |--------|-------------|
@@ -48,9 +56,10 @@ When explaining a review to the user, **summarize first**. Do not paste or resta
 ```
 
 - Expand a finding only when the user asks, or when the fix needs a decision.
-- Skip restating “what looks good,” deploy essays, and historical notes unless they change the action.
+- Skip restating "what looks good," deploy essays, and historical notes unless
+  they change the action.
 
-If the review used older labels (`Should fix`, `Minor`, `Note only`), map them:
+Map older labels to current ones before working:
 
 | Incoming label | Treat as |
 |----------------|----------|
@@ -62,24 +71,24 @@ If the review used older labels (`Should fix`, `Minor`, `Note only`), map them:
 
 ## Related user workflows
 
-Review comments are about code — the real test is: **does the user workflow still work?**
+Review comments are about code — the real test is: **does the user workflow
+still work?**
 
-| Source | Examples | What you get |
-|--------|----------|--------------|
-| Acceptance criteria | Ticket ACs, Given–When–Then | Pass/fail for the flow |
-| Requirements / PRD | `REQUIREMENTS.md`, linked product brief | Product rules |
-| Spec / contract | OpenAPI, design doc, ADR | Agreed shapes |
-| Plan / ticket | Implementation plan, PR description | Must-haves |
+| Source | What you get |
+|--------|--------------|
+| Acceptance criteria | Pass/fail for the flow |
+| Requirements / PRD | Product rules |
+| Spec / contract | Agreed shapes |
+| Plan / ticket | Must-haves |
 
-**Discover:** PR body → linked issues/docs → `docs/` / `specs/` paths the user or ticket names. Grep REQ / story IDs from the finding.
-
-**When fixing:** Map finding → story / AC / REQ → confirm the workflow still passes. Do not “fix” a test by breaking the business rule.
-
-More discovery tips: [reference.md](reference.md).
+Discover: PR body → linked issues/docs → `docs/` / `specs/` paths named in the
+ticket. Grep REQ / story IDs from the finding. When fixing, map finding → AC →
+confirm the workflow still passes. Do not "fix" a test by breaking a business
+rule.
 
 ---
 
-## What you need from the user
+## What you need
 
 | Parameter | Required? | Meaning |
 |-----------|-----------|---------|
@@ -134,13 +143,12 @@ query {
 | **Inline threads** | Comments on lines | Reply under each root comment |
 | **Body-only** (common from `code-review`) | Numbered items; no inline comments | One PR comment covering `[1]`, `[2]`, … |
 
-Parse `### [1]`, severity labels, and **File:** lines. Each section = one finding.
+Parse `### [1]`, severity labels, and **File:** lines. Each section = one
+finding.
 
-Show the user the **compact summary** before starting fixes (see [Keep it short](#keep-it-short-required)).
+Show the user the **compact summary** before starting fixes.
 
 ### 2. Open the right local repo
-
-Use the clone the user is working in (or the path they give). Do not guess a company-specific folder map.
 
 ```bash
 cd "<local-repo>"
@@ -149,22 +157,25 @@ git checkout <headRefName>
 git pull origin <headRefName>
 ```
 
-- Do not stash dirty work without asking
-- Stage **only** files for this review fix
+- Do not stash dirty work without asking.
+- Stage **only** files for this review fix.
 
 ### 3. Fix the code
 
-- Match nearby style; keep diffs small
-- If the reviewer listed options A/B/C, pick the safest small change and **name it** in the reply
-- Watch mocks/fakes — tests that mock fields the real code never sets are fake passes
-- Add/update tests when the review points at a gap
-- Run **focused** tests for the touched area (language/tooling of that repo)
+- Match nearby style; keep diffs small.
+- When the reviewer listed options A/B/C, pick the safest small change and
+  **name it** in the reply.
+- Watch mocks/fakes — tests that mock fields the real code never sets are fake
+  passes.
+- Add or update tests when the review points at a gap.
+- Run focused tests for the touched area.
 
-Re-check spec + acceptance criteria when those docs exist.
+Re-check spec and acceptance criteria when those docs exist.
 
 ### 4. Commit and push (when asked)
 
-Only when the user asked to commit / push. Follow that repo’s commit message rules if any; otherwise one clear sentence on **why**.
+Only when the user asked. Follow the repo's commit message rules; otherwise one
+clear sentence on *why*.
 
 ```bash
 git add <files>
@@ -187,7 +198,7 @@ gh api --method POST repos/<owner>/<repo>/pulls/<N>/comments \
   -F in_reply_to=<comment_id>
 ```
 
-**Body-only** — one PR comment:
+**Body-only — one PR comment:**
 
 ```bash
 gh pr comment <N> --repo <owner/repo> --body "$(cat <<'EOF'
@@ -202,7 +213,7 @@ EOF
 )"
 ```
 
-**Templates:**
+**Reply templates:**
 
 ```markdown
 Fixed in `<short-sha>`. <one sentence>. <test note if needed>.
@@ -216,7 +227,7 @@ Acknowledged. <follow-up or plan that covers it>.
 Leaving as-is: <short reason>. Happy to revisit if <condition>.
 ```
 
-Rules: reply to **every** finding; be specific but short; no essay replies.
+Reply to **every** finding. Be specific but short.
 
 ### 6. Resolve threads (when asked)
 
@@ -257,14 +268,12 @@ Short table only:
 |---------|--------|-------|
 | `[1] <file> — <title>` | Fixed / Acknowledged | link or SHA |
 
-Also: commit SHA, branch, local repo path, PR URL, resolved thread count (or `N/A — body-only`).
+Also: commit SHA, branch, local repo path, PR URL, resolved thread count (or
+`N/A — body-only`).
 
 ---
 
-## When **not** to use
+## References
 
-| Situation | Use instead |
-|-----------|-------------|
-| Writing a new formal review / merge verdict | [`code-review`](../code-review/) |
-| No PR yet — only local cleanup | Implement/fix in place; open a PR later |
-| Security deep-dive with no review threads | Security / threat-model skill if available |
+Doc discovery tips, focused test commands for Go/JS/Python, and reply hygiene
+rules: [references/reference.md](references/reference.md).

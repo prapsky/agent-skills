@@ -1,6 +1,6 @@
 # Unit test — reference
 
-Companion to [SKILL.md](SKILL.md). Concrete Go before/after patterns.
+Companion to [SKILL.md](../SKILL.md). Concrete Go before/after patterns.
 
 ---
 

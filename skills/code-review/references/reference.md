@@ -1,6 +1,6 @@
 # code-review — reference
 
-Companion to [SKILL.md](SKILL.md). Use for posting examples and optional doc discovery.
+Companion to [SKILL.md](../SKILL.md). Use for posting examples and optional doc discovery.
 
 ## Example invocation
 

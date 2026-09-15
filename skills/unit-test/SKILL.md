@@ -1,33 +1,42 @@
 ---
 name: unit-test
 description: >-
-  Write or rewrite automated unit tests, preferring table-driven cases that
-  match the package’s existing style. Use when the user asks for unit tests,
-  table-driven tests, to convert nested t.Run essays into a case table, or to
-  add coverage for a pure function / mapper / parser.
+  Writes or rewrites automated unit tests, preferring table-driven cases that
+  match the package's existing style.
+  Trigger on: write unit tests, add test coverage, make table-driven tests,
+  convert t.Run to table, add tests for this function, add a test file, cover
+  this with tests, parametrize tests, add missing unit tests, refactor tests to
+  table style, turn these tests into a table, convert nested t.Run essays,
+  write tests for this parser / mapper / validator, add a failing test.
+  Not for QA journey checklists → use test-cases instead.
+  Not for local Python API checks → use python-local-api-test instead.
+  Never change production behavior unless the user also asked for a code fix.
 ---
 
 # Unit test
 
 ## When to use
 
-- User asks to **write unit tests**, **add coverage**, or **make table-driven tests**
-- Converting scattered `t.Run` / separate `TestFoo_Case` functions into one case table
-- Testing pure helpers: mappers, parsers, normalizers, resolvers, validators
+- User asks to **write unit tests**, **add coverage**, or **make table-driven
+  tests**.
+- Converting scattered `t.Run` / separate `TestFoo_Case` functions into one
+  case table.
+- Testing pure helpers: mappers, parsers, normalizers, resolvers, validators.
 
 ## When not to use
 
-- QA journey checklists / Given–When–Then docs → [`test-cases`](../test-cases/)
-- Local Python API checks with seed data → [`python-local-api-test`](../python-local-api-test/)
-- Changing production behavior unless the user also asked for a code fix
+- QA journey checklists / Given–When–Then docs → [`test-cases`](../test-cases/).
+- Local Python API checks with seed data → [`python-local-api-test`](../python-local-api-test/).
+- Changing production behavior unless the user also asked for a code fix.
 
-**Analogy:** Unit tests are a **checklist of inputs → expected outputs**. Prefer one table you can scan in 30 seconds over many separate essays.
+**Analogy:** Unit tests are a **checklist of inputs → expected outputs**. Prefer
+one table you can scan in 30 seconds over many separate essays.
 
 ---
 
 ## Goals
 
-1. Match the **package’s existing test style** first (naming, asserts, helpers).
+1. Match the **package's existing test style** first (naming, asserts, helpers).
 2. Prefer **table-driven** tests when there are 2+ related scenarios.
 3. Cover **happy path + edges** that the code actually branches on.
 4. Run the **focused** test command and report pass/fail.
@@ -64,7 +73,7 @@ Before inventing a style:
 
 1. Open nearby `*_test.go` / test files in the **same package**.
 2. Reuse: assert library (`testify`, stdlib), `tt` vs `tc`, `t.Parallel()`, helpers.
-3. Only introduce a new pattern when the package has none.
+3. Introduce a new pattern only when the package has none.
 
 ### 2. Default shape (Go)
 
@@ -74,7 +83,7 @@ func TestThing(t *testing.T) {
 		name    string
 		input   string
 		want    string
-		wantErr string // optional: non-empty means expect error containing this
+		wantErr string // non-empty means expect error containing this
 	}{
 		{name: "happy path", input: "a", want: "A"},
 		{name: "invalid", input: "{", wantErr: "parse"},
@@ -95,16 +104,15 @@ func TestThing(t *testing.T) {
 }
 ```
 
-**Rules:**
-
-| Do | Don’t |
+| Do | Don't |
 |----|--------|
 | One row per scenario; `name` is human-readable | Duplicate almost-identical `t.Run` blocks with no shared table |
 | Fields: inputs + `want` (+ `wantErr` when needed) | Giant setup shared across unrelated behaviors in one table |
 | `require` for must-stop checks; `assert` for value checks | Ignore errors and only assert the happy return |
-| Keep production code unchanged when only tests were requested | “Improve” production logic while rewriting tests |
+| Keep production code unchanged when only tests were requested | "Improve" production logic while rewriting tests |
 
-Other languages: same idea — **cases array + loop + named subtest** (Jest `it.each`, pytest parametrize, etc.). Prefer whatever the repo already uses.
+Other languages: same idea — **cases array + loop + named subtest** (Jest
+`it.each`, pytest parametrize, etc.). Prefer whatever the repo already uses.
 
 ### 3. Case coverage checklist
 
@@ -124,18 +132,20 @@ Do **not** invent branches the code does not have.
 
 ### 4. Rewrite existing tests
 
-When asked to “make it table-driven”:
+When asked to "make it table-driven":
 
 1. Preserve **all** existing scenarios (do not drop coverage).
-2. Merge related functions (`TestFoo_Valid` + `TestFoo_Invalid` → `TestFoo` with `wantErr`).
+2. Merge related functions (`TestFoo_Valid` + `TestFoo_Invalid` → `TestFoo` with
+   `wantErr`).
 3. Split a multi-assert `t.Run` into **one row per input** when inputs differ.
-4. Leave unrelated smoke tests alone if a table does not help (e.g. one-shot init checks can stay, or use a small key→value table).
+4. Leave unrelated smoke tests alone if a table does not help (e.g. one-shot
+   init checks can stay, or use a small key→value table).
 
 ### 5. Run tests
 
 - Prefer a **narrow** `-run` / filter matching the new tests.
-- Use the project’s usual flags (e.g. Go: `go test -mod=mod ./path -run 'Pattern' -count=1`).
-- If deps download is slow, wait; do not claim pass without a green result.
+- Use the project's usual flags (e.g. Go: `go test -mod=mod ./path -run 'Pattern' -count=1`).
+- Wait for deps; do not claim pass without a green result.
 
 ---
 
@@ -146,7 +156,7 @@ When asked to “make it table-driven”:
 | [`test-cases`](../test-cases/) | Human QA checklist → may inspire unit cases; not a substitute |
 | [`python-local-api-test`](../python-local-api-test/) | HTTP-level local Python check; unit tests stay in-process |
 | [`code-review`](../code-review/) | Reviewers often ask for table-driven coverage — use this to add it |
-| [`answer-code-reviews`](../answer-code-reviews/) | If review says “make table-driven”, fix with this skill then reply |
+| [`answer-code-reviews`](../answer-code-reviews/) | If review says "make table-driven", fix with this skill then reply |
 
 ---
 
@@ -160,7 +170,10 @@ When asked to “make it table-driven”:
 
 ---
 
-## Additional resources
+## References
 
-- Before/after Go examples and anti-patterns: [reference.md](reference.md)
-- When fixtures invent phones or string IDs → [`test-data-conventions`](../test-data-conventions/SKILL.md)
+Before/after Go examples and anti-patterns:
+[references/reference.md](references/reference.md).
+
+When fixtures invent phones or string IDs →
+[`test-data-conventions`](../test-data-conventions/SKILL.md).

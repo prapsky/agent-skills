@@ -1,26 +1,30 @@
 ---
 name: code-review
 description: >-
-  Lead a pull request or branch code review against agreed docs (spec, plan,
-  requirements, acceptance criteria), run key checks, and optionally post a
-  GitHub review with a clear Yes/No merge verdict. Use when reviewing a PR,
-  reviewing a branch before open, or when the user asks for a formal code review.
+  Reviews a PR or branch against agreed docs (spec, plan, requirements,
+  acceptance criteria) and returns a clear Yes/No merge verdict — optionally
+  posted on GitHub as APPROVE or REQUEST_CHANGES.
+  Trigger on: review this PR, code review, review before merge, check this
+  branch, formal review, review and approve, is this PR ready, review against
+  the spec, give a verdict, post a review on GitHub, request changes, should
+  we merge this, look at this PR, audit this change, check the diff.
+  Not for fixing review comments → use answer-code-reviews instead.
+  Not for writing or rewriting the feature → implement first, then review.
+  Not for a vague "look at this file" with no PR, branch, or goal → ask for
+  scope first.
 ---
 
 # Code review
 
 ## What this skill does
 
-- Reviews a **code change** (PR or branch) against what was **agreed** (spec, plan, requirements, acceptance criteria)
-- Gives a clear verdict: **Yes** (merge) or **No** (blocked — see Must fix)
-- Can post the review on GitHub when asked
+- Reviews a **code change** (PR or branch) against what was **agreed** (spec,
+  plan, requirements, acceptance criteria).
+- Returns a clear verdict: **Yes** (merge) or **No** (blocked — see Must fix).
+- Posts the review on GitHub when asked.
 
-**Analogy:** Building inspection — the docs are the blueprint; the PR is the finished build.
-
-**Not for:**
-- Writing or rewriting the feature (implement first, then review)
-- Replying as the author fixing review comments → [`answer-code-reviews`](../answer-code-reviews/)
-- Vague “look at this file” with no PR/branch and no goal — ask for a PR, branch, or stated goal first
+**Analogy:** Building inspection — the docs are the blueprint; the PR is the
+finished build.
 
 ---
 
@@ -30,36 +34,35 @@ Use **4 sections only**. Plain English. One line per item.
 
 | Section | Rule |
 |---------|------|
-| **Can we merge?** | **Yes** or **No** only — must match **Must fix** (see below) |
+| **Can we merge?** | **Yes** or **No** only — must match Must fix (see below) |
 | **Must fix** | Blockers only. Write `None` if empty. |
-| **Optional** | Nice-to-haves — **not required before merge**. Write `None` if empty. |
-| **After merge** | Deploy + smoke test (ops steps, not code fixes) |
+| **Optional** | Nice-to-haves — not required before merge. Write `None` if empty. |
+| **After merge** | Deploy + smoke test ops steps, not code fixes. |
 
-### Verdict must match Must fix (required)
+### Verdict consistency (hard rules — do not break)
 
 | **Can we merge?** | **Must fix** |
 |-------------------|--------------|
 | **Yes** | `None` |
 | **No** | One or more items listed |
 
-**Consistency rules (do not break these):**
+1. Must fix is `None` → Can we merge? is **Yes** — never "after fixes", never
+   "with notes".
+2. Must fix has items → Can we merge? is **No**.
+3. Optional items never change the verdict. They are follow-up ideas, not
+   blockers.
+4. After merge is deploy/smoke/ops — not code changes. Put nothing there that
+   blocks the merge.
+5. Inline GitHub comments → **Must fix only**. Put Optional items in the review
+   body; no line comments for Optional.
+6. `post: true` → set the GitHub review `event` from the verdict (see
+   [GitHub approve checkbox](#github-approve-checkbox-required)) — writing
+   "Yes" in the body alone is not enough.
 
-1. If **Must fix** is `None` → **Can we merge?** MUST be **Yes** (never "after fixes", never "with notes").
-2. If **Must fix** has items → **Can we merge?** MUST be **No**.
-3. **Optional** items do **not** change the verdict. They are follow-up ideas, not merge blockers.
-4. **After merge** is deploy/smoke/ops — not code changes. Do not put code fixes there.
-5. **Inline GitHub comments** → **Must fix only**. Put Optional items in the review body only (no line comments).
-6. **`post: true`** → set the GitHub review **event** from the verdict (see [GitHub approve checkbox](#github-approve-checkbox-required)) — **Yes** in the body alone is not enough.
+**Forbidden phrases:** "Yes, after fixes", "Should fix", "Minor",
+"Merge readiness", long intro paragraphs, "What looks good" (unless asked).
 
-**Do not use:** What looks good, Should fix, Minor, Merge readiness, "Yes, after fixes", or long intro paragraphs.
-
-| Audience | Rule |
-|----------|------|
-| **Chat** | Table only (4 rows). No full review unless asked. |
-| **GitHub body** | Same 4 sections. ≤25 lines. One line per bullet. |
-| **Inline comments** | **Must fix only** — label + 1–2 sentences + fix |
-
-**Chat summary (default):**
+### Chat output (default)
 
 ```markdown
 **Can we merge?** Yes | No
@@ -71,28 +74,30 @@ Use **4 sections only**. Plain English. One line per item.
 | **After merge** | Deploy …; smoke … |
 ```
 
-- Skip “what looks good” unless the user asks why you approved.
-- No history banners (“supersedes review on …”) — one line in **After merge** if re-review matters.
+| Audience | Rule |
+|----------|------|
+| **Chat** | Compact 4-row table only. No full review unless asked. |
+| **GitHub body** | Same 4 sections. ≤25 lines. One line per bullet. |
+| **Inline comments** | Must fix only — label + 1–2 sentences + fix. |
 
 ---
 
-## What you need from the user
+## What you need
 
 | Parameter | Required? | Meaning |
 |-----------|-----------|---------|
-| **`repo`** | Yes (for GitHub) | e.g. `owner/repo` |
+| **`repo`** | Yes (GitHub) | `owner/repo` |
 | **`pr`** | PR **or** branch | PR number or URL |
 | **`branch`** | PR **or** branch | Branch name if no PR yet |
 | **`docs`** | Recommended | Paths or links to spec / plan / requirements / ACs |
 | **`post`** | No | `true` = post on GitHub · `false` = report only (default) |
 
-If `docs` is missing, discover them from the PR body, linked issues, `docs/`, `README`, tickets, or ask once for the agreement documents.
+When `docs` is missing, discover them from the PR body, linked issues, `docs/`,
+`README`, tickets — or ask once.
 
 ---
 
 ## Docs to read first
-
-Read whatever exists for **this** change. Typical sources (any mix is fine):
 
 | Doc type | Examples | Why |
 |----------|----------|-----|
@@ -103,9 +108,8 @@ Read whatever exists for **this** change. Typical sources (any mix is fine):
 | Test plan | VALIDATION, CI notes, test list | What should pass |
 | Conventions | CONTRIBUTING, style guide, TESTING.md | Team norms |
 
-If a doc is still marked **DRAFT**, warn the requester — do not treat it as final.
-
-More path patterns: see [reference.md](reference.md).
+Warn the requester when a doc is still marked **DRAFT** — do not treat it as
+final.
 
 ---
 
@@ -119,7 +123,7 @@ Check that the **user workflow** still works — not only that APIs or types mat
 | Requirements / PRD | Actor rules, out-of-scope |
 | Plan / ticket | Must-haves vs nice-to-haves |
 
-**Pass B checks:** happy path, edge cases, actor rules, out-of-scope creep. Cite **story / AC / REQ ID** in findings when available.
+Cite the story / AC / REQ ID in findings when available.
 
 ---
 
@@ -128,7 +132,8 @@ Check that the **user workflow** still works — not only that APIs or types mat
 ### 1. Find the change
 
 ```bash
-gh pr view <N> --repo <owner/repo> --json title,body,headRefName,baseRefName,headRefOid,files,additions,deletions,state,url
+gh pr view <N> --repo <owner/repo> \
+  --json title,body,headRefName,baseRefName,headRefOid,files,additions,deletions,state,url
 gh pr diff <N> --repo <owner/repo>
 ```
 
@@ -142,17 +147,17 @@ git diff origin/<base>...origin/<branch>
 
 ### 2. Open the local code
 
-Checkout the PR head or branch in the local clone. Do not stash dirty work without asking.
-
 ```bash
 git fetch origin <headRefName> && git checkout <headRefName>
 ```
 
+Do not stash dirty work without asking.
+
 ### 3. Read agreement docs
 
-At least: stated goal + any spec/plan/requirements/ACs linked for this change. Optional: conventions and test docs.
+At minimum: stated goal + any spec/plan/requirements/ACs linked for this change.
 
-### 4. Review code (four passes)
+### 4. Review code — four passes
 
 | Pass | Ask |
 |------|-----|
@@ -167,7 +172,7 @@ At least: stated goal + any spec/plan/requirements/ACs linked for this change. O
 |-------|---------|------|
 | **Must fix** | Must fix | Breaks agreement, security, data safety, or required tests |
 | **Optional** | Optional | Real gap, weak test, style, docs, or small tidy |
-| **After merge** | After merge | Deploy steps, smoke tests, ops notes (not PR blockers) |
+| **After merge** | After merge | Deploy steps, smoke tests, ops notes |
 
 ### 5b. Merge decision
 
@@ -178,27 +183,28 @@ Set **Can we merge?** from **Must fix** only:
 | `None` | **Yes** |
 | Has items | **No** |
 
-Optional items never change this. Do not use "Yes, after fixes" or "Approved with notes".
+Do not use "Yes, after fixes" or "Approved with notes".
 
 ### GitHub approve checkbox (required)
 
-When **`post: true`**, the review body **and** the GitHub review event must match:
+When **`post: true`**, the GitHub review `event` must match:
 
-| **Can we merge?** | GitHub `event` | Reviewers UI |
-|-------------------|----------------|--------------|
+| **Can we merge?** | GitHub `event` | Reviewer UI |
+|-------------------|----------------|-------------|
 | **Yes** | `APPROVE` | Green check — counts toward required approvals |
 | **No** | `REQUEST_CHANGES` | Changes requested — blocks merge |
 
-**Never** use `COMMENT` when **`post: true`** — that only adds text and does **not** check Approve, even if the body says "Can we merge? Yes".
+**Never** use `COMMENT` when `post: true` — that only adds text and does not
+check Approve, even if the body says "Can we merge? Yes".
 
-Use `COMMENT` only when the user explicitly asks for feedback without approving or blocking (e.g. `post: false`, or "comment only, don't approve").
+Use `COMMENT` only when the user explicitly asks for feedback without
+approving or blocking.
 
 ### 6. Share the result
 
-- **`post: false`** → chat **compact summary** (see [Keep it short](#keep-it-short-required))
-- **`post: true`** → post short GitHub body with the correct **`event`**; **inline comments only for Must fix**; still give the user the compact chat summary
-
-Pick `event` from the verdict. Full `gh api` examples: [reference.md](reference.md).
+- **`post: false`** → chat compact summary only.
+- **`post: true`** → post short GitHub body with the correct `event`; inline
+  comments for Must fix only; give the user the compact chat summary.
 
 Shortcut when **Can we merge?** is **Yes**:
 
@@ -206,16 +212,20 @@ Shortcut when **Can we merge?** is **Yes**:
 gh pr review <N> --repo <owner/repo> --approve --body "$(cat <<'EOF'
 ## PR review — …
 **Can we merge?** Yes
-…
+
+### Must fix
+None
+
+### Optional
+_Not required before merge._
+None
+
+### After merge
+- Deploy: …
+- Smoke: …
 EOF
 )"
 ```
-
-- **Yes** → always `APPROVE` (or `gh pr review --approve`)
-- **No** → always `REQUEST_CHANGES`
-- Omit inline comments when **Must fix** is `None`
-- One finding per inline comment; Must fix only
-- Link spec / plan / AC / REQ when useful — still keep it short
 
 ---
 
@@ -240,8 +250,8 @@ _Not required before merge._
 
 Before posting, verify:
 
-- **Must fix = None** ↔ **Can we merge? = Yes** ↔ **`event: APPROVE`**
-- **Must fix has items** ↔ **Can we merge? = No** ↔ **`event: REQUEST_CHANGES`**
+- Must fix = None ↔ Can we merge? = Yes ↔ `event: APPROVE`
+- Must fix has items ↔ Can we merge? = No ↔ `event: REQUEST_CHANGES`
 
 Hard limits:
 
@@ -253,18 +263,19 @@ Hard limits:
 
 ## Cross-repo / dependency notes
 
-If the change depends on another PR or migration:
+When the change depends on another PR or migration:
 
-1. Call out the dependency in **After merge** or **Must fix** (Must fix only if this PR is unsafe alone).
-2. Prefer a sensible order: schema/migrations → backend → clients (FE/mobile), unless the team’s docs say otherwise.
+1. Call out the dependency in After merge or Must fix (Must fix only when this
+   PR is unsafe to merge alone).
+2. Prefer a sensible order: schema/migrations → backend → clients, unless the
+   team's docs say otherwise.
 
 ---
 
-## When **not** to use
+## References
 
-| Situation | Do this instead |
-|-----------|-----------------|
-| No PR/branch and no agreed goal | Ask for scope first |
-| Author fixing review threads | [`answer-code-reviews`](../answer-code-reviews/) |
-| Security deep-dive only | Threat-model / security skill if available |
-| Local cleanup with no merge decision | Refactor / simplify skill if available |
+`gh api` posting examples, doc-discovery path patterns, and pass-checklist
+details: [references/reference.md](references/reference.md).
+
+**Pair skill:** [`answer-code-reviews`](../answer-code-reviews/) handles the
+author's response to review findings.
